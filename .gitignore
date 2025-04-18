@@ -1,5 +1,13 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+
+# Cypress directory
+/cypress/
+
+# Cypress result and video directories (si se usan)
+cypress/videos/
+/cypress/screenshots/
+
 # Compiled output
 /dist
 /tmp
