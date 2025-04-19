@@ -11,15 +11,15 @@
         </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="paises()" [rows]="10" [columns]="cols" [paginator]="true"
+    <p-table #dt [value]="departamentos()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarPaises" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} paises" [showCurrentPageReport]="true"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDepartamentos" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departamentos" [showCurrentPageReport]="true"
         *ngIf="!isLoading; else cargandoDatos">
 
         <ng-template #caption>
             <div class="flex items-center justify-between">
-                <h5 class="m-0">Lista de Paises</h5>
+                <h5 class="m-0">Lista de Departamentos</h5>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-search" />
                     <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
@@ -40,6 +40,26 @@
             </tr>
         </ng-template>
 
+        <ng-template #body let-departamento>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="departamento" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editarDepartamento(departamento)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="eliminarDepartamento(departamento)" />
+                </td>
+                <td>{{ departamento.nombre }}</td>
+                <td>
+                    <p-tag [value]="getEstado(departamento.estado_id)" [severity]="getEstadoSeverity(departamento.estado_id)" />
+                </td>
+                <td>{{ departamento.fecha_creacion }}</td>
+                <td>{{ departamento.fecha_modificacion }}</td>
+            </tr>
+        </ng-template>
+
         <ng-template pTemplate="body" let-rowData let-columns="columns">
             <tr>
                 <td>
@@ -47,9 +67,9 @@
                 </td>
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        (click)="editarPais(rowData)" />
+                        (click)="editarDepartamento(rowData)" />
                     <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                        (click)="eliminarPais(rowData)" />
+                        (click)="eliminarDepartamento(rowData)" />
                 </td>
                 <td *ngFor="let col of columns">
                     <ng-container [ngSwitch]="col.field">
@@ -77,7 +97,7 @@
 
             <ng-template #caption>
                 <div class="flex items-center justify-between">
-                    <h5 class="m-0">Lista de Paises</h5>
+                    <h5 class="m-0">Lista de Departamentos</h5>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-search" />
                         <input pInputText type="text" placeholder="Search..." />
@@ -112,20 +132,26 @@
         </p-table>
     </ng-template>
 
-    <p-dialog [(visible)]="paisDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'NUEVO PAÍS' : 'ACTUALIZAR PAÍS'" [modal]="true">
+    <p-dialog [(visible)]="departamentoDialogo" [style]="{ width: '450px' }"
+        [header]="accion === 1 ? 'NUEVO DEPARTAMENTO' : 'ACTUALIZAR DEPARTAMENTO'" [modal]="true">
         <ng-template #content>
             <div class="flex flex-col gap-6">
                 <div>
-                    <label for="nombre" class="block font-bold mb-3">Nombre del País</label>
-                    <input type="text" pInputText [(ngModel)]="pais.nombre" id="nombre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pais.nombre">Nombre del País es
+                    <label for="nombre" class="block font-bold mb-3">Departamento</label>
+                    <input type="text" pInputText [(ngModel)]="departamento.nombre" id="nombre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !departamento.nombre">Departamento es
                         requerido</small>
                 </div>
-
+                <div>
+                    <label for="pais_id" class="block font-bold mb-3">País</label>
+                    <p-select [(ngModel)]="departamento.pais_id" inputId="pais_id" [options]="opcionesPaisesActivos"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar País" appendTo="body" fluid />
+                    <small class="text-red-500" *ngIf="enviar && !departamento.pais_id">País es
+                            requerido</small>
+                </div>
                 <div *ngIf="accion === 2">
                     <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                    <p-select [(ngModel)]="pais.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    <p-select [(ngModel)]="departamento.estado_id" inputId="estado_id" [options]="opcionesEstado"
                         optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
                 </div>
             </div>
@@ -134,7 +160,7 @@
         <ng-template #footer>
             <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
                 (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPais()"
+            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDepartamento()"
                 [loading]="isLoading" />
         </ng-template>
 

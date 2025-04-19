@@ -4,6 +4,9 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     pais: "app/paises/",
+    paisesactivos: "app/paisesactivos/",
+
+
     crearPais: "app/pais/crear/",
     actualizarPais: (id: number) => `app/pais/actualizar/${id}/`,
     eliminarPais: (id: number) => `app/pais/eliminar/${id}/`,
@@ -19,6 +22,16 @@ export class PaisService {
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los paises:', error);
+            throw error;
+        }
+    }
+
+    async getPaisesActivos() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.paisesactivos}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener los paises activos:', error);
             throw error;
         }
     }

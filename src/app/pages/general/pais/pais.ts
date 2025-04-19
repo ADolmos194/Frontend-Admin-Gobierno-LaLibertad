@@ -188,9 +188,9 @@ export class Pais implements OnInit {
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
             await this.cargarPaises();
             this.ocultarDialogo();
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
+        } catch (error: any) {
+            const msg = error?.response?.data?.message_user || 'Error inesperado';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
         } finally {
             this.isLoading = false;
         }
@@ -231,9 +231,9 @@ export class Pais implements OnInit {
             const response = await this.paisService.deletePais(id);
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
             await this.cargarPaises();
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
+        } catch (error: any) {
+            const msg = error?.response?.data?.message_user || 'Error inesperado';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
         } finally {
             this.isLoading = false;
         }
