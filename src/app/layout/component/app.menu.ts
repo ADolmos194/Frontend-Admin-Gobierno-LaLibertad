@@ -30,6 +30,7 @@ export class AppMenu {
                     { label: 'Unidad Medida', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/unidadmedida'] },
                     { label: 'Conversion Unidad Medida', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/conversionunidadmedida'] },
                     { label: 'Mercado', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/mercado'] },
+                    { label: 'Pais', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/pais'] },
                     { label: 'Departamento', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/departamento'] },
                     { label: 'Provincia', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/provincia'] },
                     { label: 'Distrito', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/distrito'] },
