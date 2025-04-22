@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     provincias: "app/provincia/",
+    provinciasactivas: "app/provinciasactivas/",
     crearProvincia: "app/provincia/crear/",
     actualizarProvincia: (id: number) => `app/provincia/actualizar/${id}/`,
     eliminarProvincia: (id: number) => `app/provincia/eliminar/${id}/`,
@@ -22,6 +23,17 @@ export class ProvinciaService {
             throw error;
         }
     }
+
+    async getProvinciasActivas() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.provinciasactivas}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener las Provincias Activas:', error);
+            throw error;
+        }
+    }
+
 
     async createProvincia(data : any) {
         try {

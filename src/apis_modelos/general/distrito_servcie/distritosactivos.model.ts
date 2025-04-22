@@ -1,7 +1,8 @@
-export interface Provincias {
+export interface DistritosActivos {
     id: number;
     nombre: string;
-    departamento_id: number;
+    provincia_id: number;
+    nombre_provincia: string;
     estado_id: number;
     fecha_creacion: string;
     fecha_modificacion: string;

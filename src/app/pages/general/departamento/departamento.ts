@@ -18,15 +18,15 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Departamentos } from '@/apis/general/departamento_service/departamento.model';
-import { DepartamentoService } from '@/apis/general/departamento_service/departamento.service';
-import { Estado } from '@/apis/general/estado_service/estado.model';
+import { Departamentos } from '@/apis_modelos/general/departamento_service/departamento.model';
+import { DepartamentoService } from '@/apis_modelos/general/departamento_service/departamento.service';
+import { Estado } from '@/apis_modelos/general/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
-import { EstadoService } from '@/apis/general/estado_service/estado.service';
+import { EstadoService } from '@/apis_modelos/general/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
-import { PaisesActivos } from '@/apis/general/pais_service/paisesactivos.model';
-import { PaisService } from '@/apis/general/pais_service/pais.service';
+import { PaisesActivos } from '@/apis_modelos/general/pais_service/paisesactivos.model';
+import { PaisService } from '@/apis_modelos/general/pais_service/pais.service';
 
 interface Column {
     field: string;
@@ -40,7 +40,7 @@ interface ExportColumn {
 }
 
 @Component({
-    selector: 'app-clientes',
+    selector: 'app-departamento',
     standalone: true,
     imports: [
         CommonModule,

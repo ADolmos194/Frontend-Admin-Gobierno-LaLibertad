@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     distritos: "app/distrito/",
+    distritosactivos: "app/distritosactivos/",
     crearDistrito: "app/distrito/crear/",
     actualizarDistrito: (id: number) => `app/distrito/actualizar/${id}/`,
     eliminarDistrito: (id: number) => `app/distrito/eliminar/${id}/`,
@@ -19,6 +20,16 @@ export class DistritoService {
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los Distritos:', error);
+            throw error;
+        }
+    }
+
+    async getDistritosActivos() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.distritosactivos}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener los Distritos Activos:', error);
             throw error;
         }
     }

@@ -18,11 +18,11 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Paises } from '@/apis/general/pais_service/pais.model';
-import { PaisService } from '@/apis/general/pais_service/pais.service';
-import { Estado } from '@/apis/general/estado_service/estado.model';
+import { Paises } from '@/apis_modelos/general/pais_service/pais.model';
+import { PaisService } from '@/apis_modelos/general/pais_service/pais.service';
+import { Estado } from '@/apis_modelos/general/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
-import { EstadoService } from '@/apis/general/estado_service/estado.service';
+import { EstadoService } from '@/apis_modelos/general/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
 
