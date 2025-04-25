@@ -34,20 +34,21 @@ export class AppMenu {
                     { label: 'Departamento', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/departamento'] },
                     { label: 'Provincia', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/provincia'] },
                     { label: 'Distrito', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/distrito'] },
+                    { label: 'Localidad - Caserio', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/localidadcaserio'] },
                 ]
             },
             {
                 label: 'categorias',
                 items: [
                     { label: 'Tipo producto', icon: 'pi pi-fw pi-id-card', routerLink: ['/categorias/tipoproducto'] },
-                    { label: 'Productos', icon: 'pi pi-fw pi-id-card', routerLink: ['/categorias/productos'] },
+                    { label: 'Productos', icon: 'pi pi-fw pi-id-card', routerLink: ['/categorias/producto'] },
                 ]
             },
             {
                 label: 'registros precio',
                 items: [
                     { label: 'Mercado Mayorista - Minorista', icon: 'pi pi-fw pi-id-card', routerLink: ['/registros/preciomercadomayoristaminorista'] },
-                    { label: 'Ciudades', icon: 'pi pi-fw pi-id-card', routerLink: ['/registros/preciociudades'] },
+                    { label: 'Ciudades', icon: 'pi pi-fw pi-id-card', routerLink: ['/registros/preciociudad'] },
                 ]
             },
             {

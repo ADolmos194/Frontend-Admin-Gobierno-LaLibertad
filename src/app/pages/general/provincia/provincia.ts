@@ -148,7 +148,7 @@ export class Provincia implements OnInit {
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarProvincias();
         } catch (error) {
-            console.error('Error al cargar los clientes:', error);
+            console.error('Error al cargar las provincias:', error);
         } finally {
             this.isLoading = false;
         }

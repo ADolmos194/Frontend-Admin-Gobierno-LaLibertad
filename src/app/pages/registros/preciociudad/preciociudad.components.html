@@ -1,0 +1,265 @@
+<div class="card">
+    <p-toast />
+
+    <p-toolbar styleClass="mb-6">
+        <ng-template #start>
+            <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" />
+            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
+        </ng-template>
+        <ng-template #end>
+            <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="preciosciudades()" [rows]="10" [columns]="cols" [paginator]="true"
+        [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarPreciosCiudades" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Precios ciudades" [showCurrentPageReport]="true"
+        *ngIf="!isLoading; else cargandoDatos">
+
+        <ng-template #caption>
+            <div class="flex items-center justify-between">
+                <h5 class="m-0">Lista de Precios Ciudades</h5>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template #header let-columns>
+            <tr>
+                <th>
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th>Opciones</th>
+                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    {{ col.header }}
+                    <p-sortIcon [field]="col.field" />
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="rowData" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editarPrecioCiudad(rowData)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="eliminarPrecioCiudad(rowData)" />
+                </td>
+                <td *ngFor="let col of columns">
+                    <ng-container [ngSwitch]="col.field">
+                        <ng-container *ngSwitchCase="'estado_id'">
+                            <p-tag [value]="getEstado(rowData[col.field])"
+                                [severity]="getEstadoSeverity(rowData[col.field])" />
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            {{ rowData[col.field] }}
+                        </ng-container>
+                    </ng-container>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template #cargandoDatos>
+        <p-table [value]="skeletonRows"
+        [rows]="8"
+        [columns]="cols"
+        [paginator]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true"
+        >
+
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Lista de Precio Ciudad</h5>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" placeholder="Search..." />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th></th>
+                    <th>Opciones</th>
+                    <th *ngFor="let col of columns">{{ col.header }}</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-columns="columns">
+                <tr>
+                    <td>
+                        <p-skeleton size="1.5rem" styleClass="border-round" />
+                    </td>
+
+                    <td style="display: flex; align-items: center; gap: 0.5rem;">
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                    </td>
+
+                    <td *ngFor="let col of columns">
+                        <p-skeleton width="100%" height="1rem" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-template>
+
+    <p-dialog [(visible)]="preciociudadDialogo" [style]="{ width: '450px' }"
+        [header]="accion === 1 ? 'NUEVO PAÍS' : 'ACTUALIZAR PAÍS'" [modal]="true">
+        <ng-template #content>
+            <div class="flex flex-col gap-6">
+                <div>
+                    <label for="codigo" class="block font-bold mb-3">Codigo</label>
+                    <input type="text" pInputText [(ngModel)]="preciociudad.codigo" id="codigo" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.codigo">Codigo es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="serie" class="block font-bold mb-3">Serie</label>
+                    <input type="text" pInputText [(ngModel)]="preciociudad.serie" id="serie" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.serie">Serie es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="producto_id" class="block font-bold mb-3">Producto</label>
+                    <p-select [(ngModel)]="preciociudad.producto_id" inputId="producto_id" [options]="opcionesProductoActivo"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar producto" appendTo="body" fluid />
+                </div>
+                <div>
+                    <label for="conversionunidadmedida_id" class="block font-bold mb-3">Conversion Unidad Medida</label>
+                    <p-select [(ngModel)]="preciociudad.conversionunidadmedida_id" inputId="conversionunidadmedida_id" [options]="opcionesConversionUnidadMedidaActiva"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar Conversion Unidad Medida" appendTo="body" fluid />
+                </div>
+                <div>
+                    <label for="valor_enero" class="block font-bold mb-3">Valor enero</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_enero" id="valor_enero" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_enero">Valor enero es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="valor_febrero" class="block font-bold mb-3">Valor febrero</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_febrero" id="valor_febrero" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_febrero">Valor Febrero es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_marzo" class="block font-bold mb-3">Valor marzo</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_marzo" id="valor_marzo" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_marzo">Valor enero es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_abril" class="block font-bold mb-3">Valor abril</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_abril" id="valor_abril" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_abril">Valor abril es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_mayo" class="block font-bold mb-3">Valor mayo</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_mayo" id="valor_mayo" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_mayo">Valor mayo es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_junio" class="block font-bold mb-3">Valor junio</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_junio" id="valor_junio" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_junio">Valor junio es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_julio" class="block font-bold mb-3">Valor julio</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_julio" id="valor_julio" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_julio">Valor julio es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_agosto" class="block font-bold mb-3">Valor agosto</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_agosto" id="valor_agosto" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_agosto">Valor agosto es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_septiembre" class="block font-bold mb-3">Valor septiembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_septiembre" id="valor_septiembre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_septiembre">Valor septiembre es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_octubre" class="block font-bold mb-3">Valor octubre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_octubre" id="valor_octubre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_octubre">Valor octubre es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_noviembre" class="block font-bold mb-3">Valor noviembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_noviembre" id="valor_noviembre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_noviembre">Valor noviembre es
+                        requerido</small>
+                </div>
+
+                <div>
+                    <label for="valor_diciembre" class="block font-bold mb-3">Valor diciembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_diciembre" id="valor_diciembre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_diciembre">Valor diciembre es
+                        requerido</small>
+                </div>
+
+
+
+                <div *ngIf="accion === 2">
+                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                    <p-select [(ngModel)]="preciociudad.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+                (click)="ocultarDialogo()" />
+            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPrecioCiudad()"
+                [loading]="isLoading" />
+        </ng-template>
+
+    </p-dialog>
+</div>
+
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+
+<style>
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+</style>

@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { Productos } from './productos';
-import { Tipoproducto } from './tipoproducto';
+import { Producto } from './producto/producto';
+import { Tipoproducto } from './tipoproducto/tipoproducto';
 
 
 export default [
-    { path: 'productos', data: { breadcrumb: 'Productos' }, component: Productos },
+    { path: 'producto', data: { breadcrumb: 'Producto' }, component: Producto },
     { path: 'tipoproducto', data: { breadcrumb: 'Tipoproducto' }, component: Tipoproducto },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

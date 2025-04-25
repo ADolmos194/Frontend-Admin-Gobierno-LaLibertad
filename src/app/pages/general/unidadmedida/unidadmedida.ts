@@ -139,7 +139,7 @@ export class Unidadmedida implements OnInit {
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarUnidadesMedidas();
         } catch (error) {
-            console.error('Error al cargar los clientes:', error);
+            console.error('Error al cargar las unidades medidas:', error);
         } finally {
             this.isLoading = false;
         }

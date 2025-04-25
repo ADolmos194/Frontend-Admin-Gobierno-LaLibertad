@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { Preciociudades } from './preciociudades';
-import { Preciomercadomayoristaminorista } from './preciomercadomayoristaminorista';
+import { PrecioCiudad } from './preciociudad/preciociudad';
+import { Preciomercadomayoristaminorista } from './preciomercadomayoristaminorista/preciomercadomayoristaminorista';
 
 
 export default [
     { path: 'preciomercadomayoristaminorista', data: { breadcrumb: 'Preciomercadomayoristaminorista' }, component: Preciomercadomayoristaminorista },
-    { path: 'preciociudades', data: { breadcrumb: 'Preciociudades' }, component: Preciociudades },
+    { path: 'preciociudad', data: { breadcrumb: 'PrecioCiudad' }, component: PrecioCiudad },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

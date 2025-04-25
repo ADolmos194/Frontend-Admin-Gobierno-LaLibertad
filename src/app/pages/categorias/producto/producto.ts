@@ -1,4 +1,3 @@
-
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
@@ -19,13 +18,15 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConversionesUnidadesMedidas } from '@/apis_modelos/general/conversionunidadmedida_service/conversionunidadmedida.model';
-import { ConversionUnidadMedidaService } from '@/apis_modelos/general/conversionunidadmedida_service/conversionunidadmedida.service';
 import { Estado } from '@/apis_modelos/general/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EstadoService } from '@/apis_modelos/general/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
+import { Productos } from '@/apis_modelos/categorias/producto_service/producto.model';
+import { ProductoService } from '@/apis_modelos/categorias/producto_service/producto.service';
+import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
+import { TipoProductoService } from '@/apis_modelos/categorias/tipoproducto_service/tipoproducto.service';
 
 interface Column {
     field: string;
@@ -39,7 +40,7 @@ interface ExportColumn {
 }
 
 @Component({
-    selector: 'app-conversionunidadmedida',
+    selector: 'app-productos',
     standalone: true,
     imports: [
         CommonModule,
@@ -65,24 +66,29 @@ interface ExportColumn {
         Skeleton
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    templateUrl: './conversionunidadmedida.components.html',
-    providers: [MessageService, ConversionUnidadMedidaService, ConfirmationService]
+    templateUrl: './producto.components.html',
+    providers: [MessageService, ProductoService, ConfirmationService]
 })
-export class Conversionunidadmedida implements OnInit {
-    conversionunidadmedidaDialogo: boolean = false;
-    conversionesunidadesmedidas = signal<ConversionesUnidadesMedidas[]>([]);
-    conversionunidadmedida: ConversionesUnidadesMedidas = {
+export class Producto implements OnInit {
+    productoDialogo: boolean = false;
+    productos = signal<Productos[]>([]);
+    producto: Productos = {
         id: 0,
         nombre: '',
+        tipoproducto_id: 0,
+        nombre_tipoproducto: '',
+        codigo: '',
+        serie: '',
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: ''
     };
-    seleccionarConversionunidadmedida!: ConversionesUnidadesMedidas[] | null;
+    seleccionarProductos!: Productos[] | null;
     enviar: boolean = false;
     isLoading: boolean = false;
     cols: { field: string; header: string }[] = [];
     accion: number = 1;
+    opcionesTipoProducto: TiposProductosActivos[] = [];
     opcionesEstado: Estado[] = [];
 
     skeletonRows = Array(8).fill({});
@@ -97,18 +103,19 @@ export class Conversionunidadmedida implements OnInit {
     }
 
     constructor(
-        private conversionunidadmedidaService: ConversionUnidadMedidaService,
+        private productoService: ProductoService,
         private messageService: MessageService,
         private estadoService: EstadoService,
+        private tipoproductoService: TipoProductoService
     ) {}
 
-    async cargarConversionesUnidadesMedidas() {
+    async cargarProductos() {
         this.isLoading = true;
         try {
-            const response: ConversionesUnidadesMedidas[] = await this.conversionunidadmedidaService.getConversionesUnidadesMedidas();
-            this.conversionesunidadesmedidas.set(response);
+            const response: Productos[] = await this.productoService.getProductos();
+            this.productos.set(response);
         } catch (error) {
-            console.error('Error al cargar los Conversiones Unidades Medidas', error);
+            console.error('Error al cargar los productos', error);
         }
     }
 
@@ -131,16 +138,20 @@ export class Conversionunidadmedida implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         this.cols = [
-            { field: 'nombre', header: 'País' },
+            { field: 'nombre', header: 'Producto' },
+            { field: 'nombre_tipoproducto', header: 'Tipo producto' },
+            { field: 'codigo', header: 'Código' },
+            { field: 'serie', header: 'Serie' },
             { field: 'estado_id', header: 'Estado' },
             { field: 'fecha_creacion', header: 'Fecha creación' },
             { field: 'fecha_modificacion', header: 'Fecha modificación' }
         ];
         try {
+            await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProducto, 'tipo producto activo')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
-            await this.cargarConversionesUnidadesMedidas();
+            await this.cargarProductos();
         } catch (error) {
-            console.error('Error al cargar las Conversiones Unidades Medidas:', error);
+            console.error('Error al cargar los productos:', error);
         } finally {
             this.isLoading = false;
         }
@@ -150,13 +161,17 @@ export class Conversionunidadmedida implements OnInit {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
-        this.conversionunidadmedidaDialogo = true;
+        this.productoDialogo = true;
     }
 
     limpiarDatos() {
-        this.conversionunidadmedida = {
+        this.producto = {
             id: 0,
             nombre: '',
+            tipoproducto_id: 0,
+            nombre_tipoproducto: '',
+            codigo: '',
+            serie: '',
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -164,30 +179,33 @@ export class Conversionunidadmedida implements OnInit {
     }
 
     ocultarDialogo() {
-        this.conversionunidadmedidaDialogo = false;
+        this.productoDialogo = false;
         this.enviar = false;
     }
 
-    async guardarConversionesUnidadesMedidas() {
+    async guardarProducto() {
         this.enviar = true;
 
         this.isLoading = true;
         try {
 
-            const ConversionesUnidadesMedidasParaEnviar = {
-                id: this.conversionunidadmedida.id,
-                nombre: this.conversionunidadmedida.nombre,
-                estado: this.conversionunidadmedida.estado_id,
-                fecha_creacion: this.conversionunidadmedida.fecha_creacion,
-                fecha_modificacion: this.conversionunidadmedida.fecha_modificacion
+            const ProductoParaEnviar = {
+                id: this.producto.id,
+                nombre: this.producto.nombre,
+                tipoproducto: this.producto.tipoproducto_id,
+                codigo: this.producto.codigo,
+                serie: this.producto.serie,
+                estado: this.producto.estado_id,
+                fecha_creacion: this.producto.fecha_creacion,
+                fecha_modificacion: this.producto.fecha_modificacion
             };
 
             const response = this.accion === 1
-                ? await this.conversionunidadmedidaService.createConversionUnidadMedida(ConversionesUnidadesMedidasParaEnviar)
-                : await this.conversionunidadmedidaService.updateConversionUnidadMedida(this.conversionunidadmedida.id, ConversionesUnidadesMedidasParaEnviar);
+                ? await this.productoService.createProducto(ProductoParaEnviar)
+                : await this.productoService.updateProducto(this.producto.id, ProductoParaEnviar);
 
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
-            await this.cargarConversionesUnidadesMedidas();
+            await this.cargarProductos();
             this.ocultarDialogo();
         } catch (error: any) {
             const msg = error?.response?.data?.message_user || 'Error inesperado';
@@ -219,19 +237,19 @@ export class Conversionunidadmedida implements OnInit {
         }
     }
 
-    editarConversionUnidadMedida(conversionunidadmedida: ConversionesUnidadesMedidas) {
-        this.conversionunidadmedida = { ...conversionunidadmedida };
+    editarProducto(producto: Productos) {
+        this.producto = { ...producto };
         this.accion = 2;
-        this.conversionunidadmedidaDialogo = true;
+        this.productoDialogo = true;
     }
 
-    async eliminarConversionUnidadMedida(conversionunidadmedida: ConversionesUnidadesMedidas) {
-        const id = conversionunidadmedida.id;
+    async eliminarProducto(producto: Productos) {
+        const id = producto.id;
         this.isLoading = true;
         try {
-            const response = await this.conversionunidadmedidaService.deleteConversionUnidadMedida(id);
+            const response = await this.productoService.deleteProducto(id);
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarConversionesUnidadesMedidas();
+            await this.cargarProductos();
         } catch (error: any) {
             const msg = error?.response?.data?.message_user || 'Error inesperado';
             this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });

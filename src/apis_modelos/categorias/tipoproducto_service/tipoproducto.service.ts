@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     tiposproductos: "categorias/tipoproducto/",
+    tiposproductosactivos: "categorias/tiposproductosactivos/",
     crearTipoProducto: "categorias/tipoproducto/crear/",
     actualizarTipoProducto: (id: number) => `categorias/tipoproducto/actualizar/${id}/`,
     eliminarTipoProducto: (id: number) => `categorias/tipoproducto/eliminar/${id}/`,
@@ -19,6 +20,16 @@ export class TipoProductoService {
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener los Tipos de productos:', error);
+            throw error;
+        }
+    }
+
+    async getTipoProductoActivos() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.tiposproductosactivos}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener los Tipos de productos activos:', error);
             throw error;
         }
     }

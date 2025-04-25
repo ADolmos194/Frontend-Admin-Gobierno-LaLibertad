@@ -3,10 +3,10 @@ import { axiosIns, api_url } from '@/plugins/axios';
 
 export const url = api_url;
 export const endpoints = {
-    productos: "app/producto/",
-    crearProducto: "app/producto/crear/",
-    actualizarProducto: (id: number) => `app/producto/actualizar/${id}/`,
-    eliminarProducto: (id: number) => `app/producto/eliminar/${id}/`,
+    productos: "categorias/producto/",
+    crearProducto: "categorias/producto/crear/",
+    actualizarProducto: (id: number) => `categorias/producto/actualizar/${id}/`,
+    eliminarProducto: (id: number) => `categorias/producto/eliminar/${id}/`,
 };
 
 @Injectable({

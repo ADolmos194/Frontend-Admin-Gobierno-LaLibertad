@@ -38,7 +38,7 @@ interface ExportColumn {
 }
 
 @Component({
-    selector: 'app-clientes',
+    selector: 'app-paises',
     standalone: true,
     imports: [
         CommonModule,
@@ -139,7 +139,7 @@ export class Pais implements OnInit {
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarPaises();
         } catch (error) {
-            console.error('Error al cargar los clientes:', error);
+            console.error('Error al cargar los país:', error);
         } finally {
             this.isLoading = false;
         }

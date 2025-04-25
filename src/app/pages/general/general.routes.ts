@@ -6,6 +6,7 @@ import { Mercado } from './mercado/mercado';
 import { Conversionunidadmedida } from './conversionunidadmedida/conversionunidadmedida';
 import { Unidadmedida } from './unidadmedida/unidadmedida';
 import { Pais } from './pais/pais';
+import { LocalidadCaserio } from './localidadcaserio/localidadcaserio';
 
 
 export default [
@@ -16,6 +17,6 @@ export default [
     { path: 'departamento', data: { breadcrumb: 'Departamento' }, component: Departamento },
     { path: 'provincia', data: { breadcrumb: 'Provincia' }, component: Provincia },
     { path: 'distrito', data: { breadcrumb: 'Distrito' }, component: Distrito },
-
+    { path: 'localidadcaserio', data: { breadcrumb: 'LocalidadCaserio' }, component: LocalidadCaserio },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

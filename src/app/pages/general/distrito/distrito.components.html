@@ -1,0 +1,196 @@
+<div class="card">
+    <p-toast />
+
+    <p-toolbar styleClass="mb-6">
+        <ng-template #start>
+            <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" />
+            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
+        </ng-template>
+        <ng-template #end>
+            <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="distritos()" [rows]="10" [columns]="cols" [paginator]="true"
+        [globalFilterFields]="['nombre','nombre_pais','fecha_creacion', 'fecha_modificacion']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDistritos" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} distritos" [showCurrentPageReport]="true"
+        *ngIf="!isLoading; else cargandoDatos">
+
+        <ng-template #caption>
+            <div class="flex items-center justify-between">
+                <h5 class="m-0">Lista de Distritos</h5>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template #header let-columns>
+            <tr>
+                <th>
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th>Opciones</th>
+                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    {{ col.header }}
+                    <p-sortIcon [field]="col.field" />
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-distrito>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="distrito" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editarDistrito(distrito)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="eliminarDistrito(distrito)" />
+                </td>
+                <td>{{ distrito.nombre }}</td>
+                <td>{{ distrito.nombre_provincia }}</td>
+                <td>
+                    <p-tag [value]="getEstado(distrito.estado_id)" [severity]="getEstadoSeverity(distrito.estado_id)" />
+                </td>
+                <td>{{ distrito.fecha_creacion }}</td>
+                <td>{{ distrito.fecha_modificacion }}</td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="rowData" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editarDistrito(rowData)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="eliminarDistrito(rowData)" />
+                </td>
+                <td *ngFor="let col of columns">
+                    <ng-container [ngSwitch]="col.field">
+                        <ng-container *ngSwitchCase="'estado_id'">
+                            <p-tag [value]="getEstado(rowData[col.field])"
+                                [severity]="getEstadoSeverity(rowData[col.field])" />
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            {{ rowData[col.field] }}
+                        </ng-container>
+                    </ng-container>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template #cargandoDatos>
+        <p-table [value]="skeletonRows"
+        [rows]="8"
+        [columns]="cols"
+        [paginator]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [showCurrentPageReport]="true"
+        >
+
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Lista de Distritos</h5>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" placeholder="Search..." />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th></th>
+                    <th>Opciones</th>
+                    <th *ngFor="let col of columns">{{ col.header }}</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-columns="columns">
+                <tr>
+                    <td>
+                        <p-skeleton size="1.5rem" styleClass="border-round" />
+                    </td>
+
+                    <td style="display: flex; align-items: center; gap: 0.5rem;">
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                    </td>
+
+                    <td *ngFor="let col of columns">
+                        <p-skeleton width="100%" height="1rem" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-template>
+
+    <p-dialog [(visible)]="distritoDialogo" [style]="{ width: '450px' }"
+        [header]="accion === 1 ? 'NUEVO DISTRITO' : 'ACTUALIZAR DISTRITO'" [modal]="true">
+        <ng-template #content>
+            <div class="flex flex-col gap-6">
+                <div>
+                    <label for="nombre" class="block font-bold mb-3">Distrito</label>
+                    <input type="text" pInputText [(ngModel)]="distrito.nombre" id="nombre" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !distrito.nombre">Distrito es
+                        requerido</small>
+                </div>
+                <div>
+                    <label for="provincia_id" class="block font-bold mb-3">Provincia</label>
+                    <p-select [(ngModel)]="distrito.provincia_id" inputId="provincia_id" [options]="opcionesProvinciasActivas"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar Provincia" appendTo="body" fluid />
+                    <small class="text-red-500" *ngIf="enviar && !distrito.provincia_id">Provincia es
+                            requerido</small>
+                </div>
+                <div *ngIf="accion === 2">
+                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                    <p-select [(ngModel)]="distrito.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+                (click)="ocultarDialogo()" />
+            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDistrito()"
+                [loading]="isLoading" />
+        </ng-template>
+
+    </p-dialog>
+</div>
+
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+
+<style>
+    .contenedor {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+</style>
