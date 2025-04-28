@@ -27,6 +27,7 @@ import { EstadoService } from '@/apis_modelos/general/estado_service/estado.serv
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
 import { ProductoService } from '@/apis_modelos/categorias/producto_service/producto.service';
+import { ConversionesUnidadesMedidasActivos } from '@/apis_modelos/general/conversionunidadmedida_service/conversionunidadmedidaactivos.model';
 import { ConversionUnidadMedidaService } from '@/apis_modelos/general/conversionunidadmedida_service/conversionunidadmedida.service';
 
 interface Column {
@@ -81,6 +82,7 @@ export class PrecioCiudad implements OnInit {
         nombre_producto: '',
         conversionunidadmedida_id: 0,
         nombre_conversionunidadmedida: '',
+        valor_anual: 0,
         valor_enero: 0,
         valor_febrero: 0,
         valor_marzo: 0,
@@ -104,7 +106,7 @@ export class PrecioCiudad implements OnInit {
     accion: number = 1;
     opcionesEstado: Estado[] = [];
     opcionesProductoActivo: Estado[] = [];
-    opcionesConversionUnidadMedidaActiva: Estado[] = [];
+    opcionesConversionUnidadMedidaActiva: ConversionesUnidadesMedidasActivos[] = [];
 
     skeletonRows = Array(8).fill({});
 
@@ -157,6 +159,7 @@ export class PrecioCiudad implements OnInit {
             { field: 'codigo_serie', header: 'Codigo - Serie ' },
             { field: 'nombre_producto', header: 'Nombre producto' },
             { field: 'nombre_conversionunidadmedida', header: 'Unidad medida' },
+            { field: 'valor_anual', header: 'Valor anual' },
             { field: 'estado_id', header: 'Estado' },
             { field: 'fecha_creacion', header: 'Fecha creación' },
             { field: 'fecha_modificacion', header: 'Fecha modificación' }
@@ -189,6 +192,7 @@ export class PrecioCiudad implements OnInit {
             nombre_producto: '',
             conversionunidadmedida_id: 0,
             nombre_conversionunidadmedida: '',
+            valor_anual: 0,
             valor_enero: 0,
             valor_febrero: 0,
             valor_marzo: 0,
@@ -224,6 +228,7 @@ export class PrecioCiudad implements OnInit {
                 serie: this.preciociudad.serie,
                 producto: this.preciociudad.producto_id,
                 conversionunidadmedida: this.preciociudad.conversionunidadmedida_id,
+                valor_anual: this.preciociudad.valor_anual,
                 valor_enero: this.preciociudad.valor_enero,
                 valor_febrero: this.preciociudad.valor_febrero,
                 valor_marzo: this.preciociudad.valor_marzo,
@@ -236,7 +241,7 @@ export class PrecioCiudad implements OnInit {
                 valor_octubre: this.preciociudad.valor_octubre,
                 valor_noviembre: this.preciociudad.valor_noviembre,
                 valor_diciembre: this.preciociudad.valor_diciembre,
-                estado_id: this.preciociudad.estado_id,
+                estado: this.preciociudad.estado_id,
                 fecha_creacion: this.preciociudad.fecha_creacion,
                 fecha_modificacion: this.preciociudad.fecha_modificacion
             };

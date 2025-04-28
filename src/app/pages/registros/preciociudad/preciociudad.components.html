@@ -12,7 +12,7 @@
     </p-toolbar>
 
     <p-table #dt [value]="preciosciudades()" [rows]="10" [columns]="cols" [paginator]="true"
-        [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
+        [globalFilterFields]="['codigo_serie','nombre_producto','nombre_conversionunidadmedida','fecha_creacion', 'fecha_modificacion']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarPreciosCiudades" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Precios ciudades" [showCurrentPageReport]="true"
         *ngIf="!isLoading; else cargandoDatos">
@@ -113,7 +113,7 @@
     </ng-template>
 
     <p-dialog [(visible)]="preciociudadDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'NUEVO PAÍS' : 'ACTUALIZAR PAÍS'" [modal]="true">
+        [header]="accion === 1 ? 'NUEVO PRECIOS EN CIUDADES: PRECIOS POR MAYORISTA, PROMEDIO MENSUAL, SEGUN PRODUCTO Y VARIEDAD' : 'ACTUALIZAR PRECIOS EN CIUDADES: PRECIOS POR MAYORISTA, PROMEDIO MENSUAL, SEGUN PRODUCTO Y VARIEDAD'" [modal]="true">
         <ng-template #content>
             <div class="flex flex-col gap-6">
                 <div>
@@ -139,86 +139,66 @@
                         optionLabel="nombre" optionValue="id" placeholder="Seleccionar Conversion Unidad Medida" appendTo="body" fluid />
                 </div>
                 <div>
-                    <label for="valor_enero" class="block font-bold mb-3">Valor enero</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_enero" id="valor_enero" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_enero">Valor enero es
-                        requerido</small>
+                    <label for="valor_anual" class="block font-bold mb-3">Promedio Anual</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_anual" id="valor_anual" fluid />
                 </div>
                 <div>
-                    <label for="valor_febrero" class="block font-bold mb-3">Valor febrero</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_febrero" id="valor_febrero" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_febrero">Valor Febrero es
-                        requerido</small>
+                    <label for="valor_enero" class="block font-bold mb-3">Promedio enero</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_enero" id="valor_enero" fluid />
                 </div>
-
                 <div>
-                    <label for="valor_marzo" class="block font-bold mb-3">Valor marzo</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_marzo" id="valor_marzo" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_marzo">Valor enero es
-                        requerido</small>
+                    <label for="valor_febrero" class="block font-bold mb-3">Promedio febrero</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_febrero" id="valor_febrero" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_abril" class="block font-bold mb-3">Valor abril</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_abril" id="valor_abril" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_abril">Valor abril es
-                        requerido</small>
+                    <label for="valor_marzo" class="block font-bold mb-3">Promedio marzo</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_marzo" id="valor_marzo" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_mayo" class="block font-bold mb-3">Valor mayo</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_mayo" id="valor_mayo" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_mayo">Valor mayo es
-                        requerido</small>
+                    <label for="valor_abril" class="block font-bold mb-3">Promedio abril</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_abril" id="valor_abril" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_junio" class="block font-bold mb-3">Valor junio</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_junio" id="valor_junio" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_junio">Valor junio es
-                        requerido</small>
+                    <label for="valor_mayo" class="block font-bold mb-3">Promedio mayo</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_mayo" id="valor_mayo" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_julio" class="block font-bold mb-3">Valor julio</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_julio" id="valor_julio" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_julio">Valor julio es
-                        requerido</small>
+                    <label for="valor_junio" class="block font-bold mb-3">Promedio junio</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_junio" id="valor_junio" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_agosto" class="block font-bold mb-3">Valor agosto</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_agosto" id="valor_agosto" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_agosto">Valor agosto es
-                        requerido</small>
+                    <label for="valor_julio" class="block font-bold mb-3">Promedio julio</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_julio" id="valor_julio" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_septiembre" class="block font-bold mb-3">Valor septiembre</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_septiembre" id="valor_septiembre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_septiembre">Valor septiembre es
-                        requerido</small>
+                    <label for="valor_agosto" class="block font-bold mb-3">Promedio agosto</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_agosto" id="valor_agosto" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_octubre" class="block font-bold mb-3">Valor octubre</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_octubre" id="valor_octubre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_octubre">Valor octubre es
-                        requerido</small>
+                    <label for="valor_septiembre" class="block font-bold mb-3">Promedio septiembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_septiembre" id="valor_septiembre" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_noviembre" class="block font-bold mb-3">Valor noviembre</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_noviembre" id="valor_noviembre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_noviembre">Valor noviembre es
-                        requerido</small>
+                    <label for="valor_octubre" class="block font-bold mb-3">Promedio octubre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_octubre" id="valor_octubre" fluid />
                 </div>
 
                 <div>
-                    <label for="valor_diciembre" class="block font-bold mb-3">Valor diciembre</label>
-                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_diciembre" id="valor_diciembre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !preciociudad.valor_diciembre">Valor diciembre es
-                        requerido</small>
+                    <label for="valor_noviembre" class="block font-bold mb-3">Promedio noviembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_noviembre" id="valor_noviembre" fluid />
+                </div>
+
+                <div>
+                    <label for="valor_diciembre" class="block font-bold mb-3">Promedio diciembre</label>
+                    <input type="number" pInputText [(ngModel)]="preciociudad.valor_diciembre" id="valor_diciembre" fluid />
                 </div>
 
 

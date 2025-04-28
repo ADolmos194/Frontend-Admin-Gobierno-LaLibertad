@@ -4,6 +4,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 export const url = api_url;
 export const endpoints = {
     conversionesunidadesmedidas: "app/conversionunidadmedida/",
+    conversionunidadmedidaactivos: "app/conversionunidadmedidaactivos/",
     crearConversionUnidadmedida: "app/conversionunidadmedida/crear/",
     actualizarConversionUnidadmedida: (id: number) => `app/conversionunidadmedida/actualizar/${id}/`,
     eliminarConversionUnidadmedida: (id: number) => `app/conversionunidadmedida/eliminar/${id}/`,
@@ -16,6 +17,16 @@ export class ConversionUnidadMedidaService {
     async getConversionesUnidadesMedidas() {
         try {
             const response = await axiosIns.get(`${url}${endpoints.conversionesunidadesmedidas}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener las Conversiones de Unidades de Medidas:', error);
+            throw error;
+        }
+    }
+
+    async getConversionesUnidadesMedidasActivos() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.conversionunidadmedidaactivos}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener las Conversiones de Unidades de Medidas:', error);

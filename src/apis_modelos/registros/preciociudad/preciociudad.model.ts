@@ -6,6 +6,7 @@ export interface PreciosCiudades {
     nombre_producto: string;
     conversionunidadmedida_id: number;
     nombre_conversionunidadmedida: string;
+    valor_anual: number;
     valor_enero: number;
     valor_febrero: number;
     valor_marzo: number;
