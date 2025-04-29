@@ -66,7 +66,7 @@ export class AppMenu {
             {
                 label: 'demandas',
                 items: [
-                    { label: 'Productos Agropecuarios', icon: 'pi pi-fw pi-id-card', routerLink: ['/demandas/productoagropecuario'] },
+                    { label: 'Productos Agropecuarios', icon: 'pi pi-fw pi-id-card', routerLink: ['/demandas/demandaproductoagropecuario'] },
                 ]
             },
         ];

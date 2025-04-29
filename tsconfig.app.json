@@ -10,6 +10,7 @@
         "src/main.ts"
     ],
     "include": [
-        "src/**/*.d.ts"
+        "src/**/*.d.ts",
+        "src/environments/**/*npm install -g firebase-tools.ts"
     ]
 }

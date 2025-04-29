@@ -30,5 +30,13 @@
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true
-    }
+    },
+    "include": [
+    "src/**/*.ts",           // Incluye todos los archivos .ts en src
+    "src/environments/**/*.ts"  // Incluye los archivos de entorno
+    ],
+    "exclude": [
+        "node_modules",        // Excluye la carpeta node_modules
+        "**/*.spec.ts"         // Excluye los archivos de prueba .spec.ts
+    ]
 }

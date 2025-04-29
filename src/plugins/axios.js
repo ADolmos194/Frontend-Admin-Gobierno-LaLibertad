@@ -1,7 +1,8 @@
+
+import { environment } from  '@/environments/environment';
 import axios from 'axios';
 
-
-export const api_url = 'http://127.0.0.1:8000/';
+export const api_url =  environment.apiUrl;
 
 export const axiosIns = axios.create({
     baseURL: api_url,

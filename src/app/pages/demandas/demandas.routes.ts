@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
-import { Productoagropecuario } from './productoagropecuario';
-
-
+import { DemandaProductoAgropecuario } from './demandaproductoagropecuario/demandaproductoagropecuario';
 export default [
-    { path: 'productoagropecuario', data: { breadcrumb: 'Productoagropecuario' }, component: Productoagropecuario },
+    { path: 'demandaproductoagropecuario', data: { breadcrumb: 'DemandaProductoAgropecuario' }, component: DemandaProductoAgropecuario },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
