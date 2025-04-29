@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "sakai-ng": {
+    "frontend-admin": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/sakai-ng",
+            "outputPath": "dist/frontend-admin",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -38,7 +38,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1mb",
+                  "maximumWarning": "2mb",
                   "maximumError": "5mb"
                 },
                 {
@@ -61,10 +61,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "sakai-ng:build:production"
+              "buildTarget": "frontend-admin:build:production"
             },
             "development": {
-              "buildTarget": "sakai-ng:build:development"
+              "buildTarget": "frontend-admin:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -96,11 +96,11 @@
         "cypress-run": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "sakai-ng:serve"
+            "devServerTarget": "frontend-admin:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "sakai-ng:serve:production"
+              "devServerTarget": "frontend-admin:serve:production"
             }
           }
         },
@@ -114,27 +114,27 @@
         "ct": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "sakai-ng:serve",
+            "devServerTarget": "frontend-admin:serve",
             "watch": true,
             "headless": false,
             "testingType": "component"
           },
           "configurations": {
             "development": {
-              "devServerTarget": "sakai-ng:serve:development"
+              "devServerTarget": "frontend-admin:serve:development"
             }
           }
         },
         "e2e": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "sakai-ng:serve",
+            "devServerTarget": "frontend-admin:serve",
             "watch": true,
             "headless": false
           },
           "configurations": {
             "production": {
-              "devServerTarget": "sakai-ng:serve:production"
+              "devServerTarget": "frontend-admin:serve:production"
             }
           }
         }
