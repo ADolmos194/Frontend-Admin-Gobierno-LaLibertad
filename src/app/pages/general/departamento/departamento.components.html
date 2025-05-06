@@ -10,12 +10,14 @@
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
         </ng-template>
     </p-toolbar>
+</div>
 
+<div class="card">
     <p-table #dt [value]="departamentos()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre','nombre_pais','fecha_creacion', 'fecha_modificacion']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDepartamentos" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departamentos" [showCurrentPageReport]="true"
-        *ngIf="!isLoading; else cargandoDatos">
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} departamentos"
+        [showCurrentPageReport]="true" *ngIf="!isLoading; else cargandoDatos">
 
         <ng-template #caption>
             <div class="flex items-center justify-between">
@@ -53,7 +55,8 @@
                 </td>
                 <td>{{ departamento.nombre }}</td>
                 <td>
-                    <p-tag [value]="getEstado(departamento.estado_id)" [severity]="getEstadoSeverity(departamento.estado_id)" />
+                    <p-tag [value]="getEstado(departamento.estado_id)"
+                        [severity]="getEstadoSeverity(departamento.estado_id)" />
                 </td>
                 <td>{{ departamento.fecha_creacion }}</td>
                 <td>{{ departamento.fecha_modificacion }}</td>
@@ -87,13 +90,9 @@
     </p-table>
 
     <ng-template #cargandoDatos>
-        <p-table [value]="skeletonRows"
-        [rows]="8"
-        [columns]="cols"
-        [paginator]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [showCurrentPageReport]="true"
-        >
+        <p-table [value]="skeletonRows" [rows]="8" [columns]="cols" [paginator]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [showCurrentPageReport]="true">
 
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -131,41 +130,41 @@
             </ng-template>
         </p-table>
     </ng-template>
-
-    <p-dialog [(visible)]="departamentoDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'NUEVO DEPARTAMENTO' : 'ACTUALIZAR DEPARTAMENTO'" [modal]="true">
-        <ng-template #content>
-            <div class="flex flex-col gap-6">
-                <div>
-                    <label for="nombre" class="block font-bold mb-3">Departamento</label>
-                    <input type="text" pInputText [(ngModel)]="departamento.nombre" id="nombre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !departamento.nombre">Departamento es
-                        requerido</small>
-                </div>
-                <div>
-                    <label for="pais_id" class="block font-bold mb-3">País</label>
-                    <p-select [(ngModel)]="departamento.pais_id" inputId="pais_id" [options]="opcionesPaisesActivos"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar País" appendTo="body" fluid />
-                    <small class="text-red-500" *ngIf="enviar && !departamento.pais_id">País es
-                            requerido</small>
-                </div>
-                <div *ngIf="accion === 2">
-                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                    <p-select [(ngModel)]="departamento.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template #footer>
-            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
-                (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDepartamento()"
-                [loading]="isLoading" />
-        </ng-template>
-
-    </p-dialog>
 </div>
+
+<p-dialog [(visible)]="departamentoDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'NUEVO DEPARTAMENTO' : 'ACTUALIZAR DEPARTAMENTO'" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="nombre" class="block font-bold mb-3">Departamento</label>
+                <input type="text" pInputText [(ngModel)]="departamento.nombre" id="nombre" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !departamento.nombre">Departamento es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="pais_id" class="block font-bold mb-3">País</label>
+                <p-select [(ngModel)]="departamento.pais_id" inputId="pais_id" [options]="opcionesPaisesActivos"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar País" appendTo="body" fluid />
+                <small class="text-red-500" *ngIf="enviar && !departamento.pais_id">País es
+                    requerido</small>
+            </div>
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="departamento.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDepartamento()"
+            [loading]="isLoading" />
+    </ng-template>
+
+</p-dialog>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
 

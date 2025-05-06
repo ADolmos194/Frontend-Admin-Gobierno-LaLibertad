@@ -10,7 +10,9 @@
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
         </ng-template>
     </p-toolbar>
+</div>
 
+<div class="card">
     <p-table #dt [value]="unidadesmedidas()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarUnidadMedida" [rowHover]="true" dataKey="id"
@@ -111,8 +113,9 @@
             </ng-template>
         </p-table>
     </ng-template>
+</div>
 
-    <p-dialog [(visible)]="unidadmedidaDialogo" [style]="{ width: '450px' }"
+<p-dialog [(visible)]="unidadmedidaDialogo" [style]="{ width: '450px' }"
         [header]="accion === 1 ? 'NUEVA UNIDAD MEDIDA' : 'ACTUALIZAR UNIDAD MEDIDA'" [modal]="true">
         <ng-template #content>
             <div class="flex flex-col gap-6">
@@ -139,7 +142,6 @@
         </ng-template>
 
     </p-dialog>
-</div>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
 

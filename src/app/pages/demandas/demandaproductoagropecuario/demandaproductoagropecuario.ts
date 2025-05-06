@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, ViewChild, model } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -19,19 +19,33 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DemandaProductosAgropecuarios } from '@/apis_modelos/demandas/demandaproductosagropecuarios.model';
-import { DemandaProductosAgropecuariosService } from '@/apis_modelos/demandas/demandaproductosagropecuarios.service';
+import { DataView } from 'primeng/dataview';
+import { Tag } from 'primeng/tag';
+import { SelectButton } from 'primeng/selectbutton';
+import { DemandaProductosAgropecuarios } from '@/apis_modelos/demandas/demandaproductosagropecuarios/demandaproductosagropecuarios.model';
+import { DemandaProductosAgropecuariosService } from '@/apis_modelos/demandas/demandaproductosagropecuarios/demandaproductosagropecuarios.service';
 import { Estado } from '@/apis_modelos/general/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EstadoService } from '@/apis_modelos/general/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
+import { DividerModule } from 'primeng/divider';
+import { CarouselModule } from 'primeng/carousel';
+import { GalleriaModule } from 'primeng/galleria';
+import { CardModule } from 'primeng/card';
 import { ProductosActivos } from '@/apis_modelos/categorias/producto_service/productoactivo.model';
 import { ProductoService } from '@/apis_modelos/categorias/producto_service/producto.service';
+import { TipoProductoService } from '@/apis_modelos/categorias/tipoproducto_service/tipoproducto.service';
 import { DistritosActivos } from '@/apis_modelos/general/distrito_servcie/distritosactivos.model';
 import { DistritoService } from '@/apis_modelos/general/distrito_servcie/distrito.service';
 import { ProvinciasActivas } from '@/apis_modelos/general/provincia_service/provinciasactivas.model';
 import { ProvinciaService } from '@/apis_modelos/general/provincia_service/provincia.service';
+import { ImageUploadService } from '@/apis_modelos/imagenes/imagenes.service';
+import { DatePicker } from 'primeng/datepicker';
+import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
+import { FileUpload } from 'primeng/fileupload';
+;
+
 
 interface Column {
     field: string;
@@ -50,6 +64,7 @@ interface ExportColumn {
     standalone: true,
     imports: [
         CommonModule,
+        DataView,
         TableModule,
         DrawerModule,
         FormsModule,
@@ -70,21 +85,37 @@ interface ExportColumn {
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
-        Skeleton
+        Tag,
+        SelectButton,
+        Skeleton,
+        DividerModule,
+        CarouselModule,
+        GalleriaModule,
+        CardModule,
+        DatePicker,
+        FileUpload
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: "./demandaproductoagropecuario.components.html",
-    providers: [MessageService, DemandaProductosAgropecuariosService, ConfirmationService]
+    providers: [MessageService, DemandaProductosAgropecuariosService, ConfirmationService, ImageUploadService]
 })
+
+
 export class DemandaProductoAgropecuario implements OnInit {
     demandaproductoagropecuarioDialogo: boolean = false;
     demandasproductosagropecuarios = signal<DemandaProductosAgropecuarios[]>([]);
+    fechaHoy: Date = new Date();
     demandaproductoagropecuario: DemandaProductosAgropecuarios = {
         id: 0,
         provincia_id: 0,
         distrito_id: 0,
         nombre_provincia_distrito: '',
-        fecha_publicacion: '',
+        fecha_publicacion: this.fechaHoy.toISOString().split('T')[0],
+        tipoproducto_id: 0,
+        nombre_tipoproducto: '',
+        producto_id: 0,
+        nombre_producto: '',
+        url_imagen: '',
         descripcion: '',
         nota: '',
         direccion: '',
@@ -94,20 +125,47 @@ export class DemandaProductoAgropecuario implements OnInit {
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
-        detalle: []
-
     };
     seleccionarDemandaProductosAgropecuarios!: DemandaProductosAgropecuarios[] | null;
     enviar: boolean = false;
     isLoading: boolean = false;
-    cols: { field: string; header: string }[] = [];
+    cols!: Column[];
     accion: number = 1;
     opcionesEstado: Estado[] = [];
     opcionesProvinciasActivas: ProvinciasActivas[] = [];
     opcionesDistritosActivos: DistritosActivos[] = [];
     opcionesProductosActivos: ProductosActivos[] = [];
+    opcionesTipoProductosActivos: TiposProductosActivos[] = [];
 
-    skeletonRows = Array(8).fill({});
+    layout: string = 'grid';
+
+    options = ['grid'];
+
+
+    selectedFile: File | null = null;
+
+    onImageSelected(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            this.selectedFile = file;
+        }
+    }
+
+    uploadedFiles: File[] = [];
+
+    onFileUpload(event: any) {
+        const file: File = event.files[0];
+        if (file) {
+            this.uploadedFiles = [file];
+            this.selectedFile = file;
+            this.messageService.add({ severity: 'info', summary: 'Imagen insertada', detail: '' });
+        }
+    }
+
+
+
+
+
 
     estado = [
         { label: 'ACTIVO', value: 1 },
@@ -125,13 +183,17 @@ export class DemandaProductoAgropecuario implements OnInit {
         private provinciaService: ProvinciaService,
         private distritoService: DistritoService,
         private productoService: ProductoService,
+        private tipoproductoService: TipoProductoService,
+        private imageUploadService: ImageUploadService,
     ) { }
+
 
     async cargarDemandaProductosAgropecuarios() {
         this.isLoading = true;
         try {
             const response: DemandaProductosAgropecuarios[] = await this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios();
             this.demandasproductosagropecuarios.set(response);
+
         } catch (error) {
             console.error('Error al cargar las demandas productos agropecuarios', error);
         }
@@ -153,27 +215,19 @@ export class DemandaProductoAgropecuario implements OnInit {
         }
     }
 
+    demandasProductosAgropecuarios: any[] = [];
+
+
     async ngOnInit() {
         this.isLoading = true;
-        this.cols = [
-            { field: 'nombre_provincia_distrito', header: 'Provincia - Distrito' },
-            { field: 'fecha_publicacion', header: 'Fecha publicación' },
-            { field: 'descripcion', header: 'Descripción' },
-            { field: 'nota', header: 'Nota' },
-            { field: 'direccion', header: 'Dirección' },
-            { field: 'contacto', header: 'Contacto' },
-            { field: 'telefono', header: 'Teléfono' },
-            { field: 'email', header: 'Email' },
-            { field: 'estado_id', header: 'Estado' },
-            { field: 'fecha_creacion', header: 'Fecha creación' },
-            { field: 'fecha_modificacion', header: 'Fecha modificación' }
-        ];
         try {
             await Promise.all([this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciasActivas, 'provincias activas')]);
             await Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')]);
             await Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')]);
+            await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarDemandaProductosAgropecuarios();
+            this.demandasProductosAgropecuarios = this.demandasproductosagropecuarios();
         } catch (error) {
             console.error('Error al cargar los país:', error);
         } finally {
@@ -194,7 +248,12 @@ export class DemandaProductoAgropecuario implements OnInit {
             provincia_id: 0,
             distrito_id: 0,
             nombre_provincia_distrito: '',
-            fecha_publicacion: '',
+            fecha_publicacion: this.fechaHoy.toISOString().split('T')[0],
+            tipoproducto_id: 0,
+            nombre_tipoproducto: '',
+            producto_id: 0,
+            nombre_producto: '',
+            url_imagen: '',
             descripcion: '',
             nota: '',
             direccion: '',
@@ -204,7 +263,6 @@ export class DemandaProductoAgropecuario implements OnInit {
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: '',
-            detalle: []
         };
     }
 
@@ -218,12 +276,23 @@ export class DemandaProductoAgropecuario implements OnInit {
 
         this.isLoading = true;
         try {
+            // Asegurarse de que la fecha esté en formato correcto 'YYYY-MM-DD'
+            const fechaPublicacion = new Date(this.demandaproductoagropecuario.fecha_publicacion);
+            this.demandaproductoagropecuario.fecha_publicacion = fechaPublicacion.toISOString().split('T')[0];  // Formato 'YYYY-MM-DD'
+
+            if (this.selectedFile) {
+                const uploadResp: any = await this.imageUploadService.uploadImage(this.selectedFile).toPromise();
+                this.demandaproductoagropecuario.url_imagen = uploadResp.secure_url;
+            }
 
             const DemandaProductoAgropecuarioParaEnviar = {
                 id: this.demandaproductoagropecuario.id,
-                provincia_id: this.demandaproductoagropecuario.provincia_id,
-                distrito_id: this.demandaproductoagropecuario.distrito_id,
+                provincia: this.demandaproductoagropecuario.provincia_id,
+                distrito: this.demandaproductoagropecuario.distrito_id,
                 fecha_publicacion: this.demandaproductoagropecuario.fecha_publicacion,
+                tipoproducto: this.demandaproductoagropecuario.tipoproducto_id || null,
+                producto: this.demandaproductoagropecuario.producto_id || null,
+                url_imagen: this.demandaproductoagropecuario.url_imagen,
                 descripcion: this.demandaproductoagropecuario.descripcion,
                 nota: this.demandaproductoagropecuario.nota,
                 direccion: this.demandaproductoagropecuario.direccion,
@@ -278,7 +347,7 @@ export class DemandaProductoAgropecuario implements OnInit {
         this.demandaproductoagropecuarioDialogo = true;
     }
 
-    async eliminarDemandaProductosAgropecuarios(demandaproductoagropecuario: DemandaProductosAgropecuarios){
+    async eliminarDemandaProductosAgropecuarios(demandaproductoagropecuario: DemandaProductosAgropecuarios) {
         const id = demandaproductoagropecuario.id;
         this.isLoading = true;
         try {
@@ -292,6 +361,7 @@ export class DemandaProductoAgropecuario implements OnInit {
             this.isLoading = false;
         }
     }
+
 }
 
 

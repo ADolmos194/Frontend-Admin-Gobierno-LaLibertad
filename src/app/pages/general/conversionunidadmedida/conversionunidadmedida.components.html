@@ -10,12 +10,15 @@
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
         </ng-template>
     </p-toolbar>
+</div>
 
+<div class="card">
     <p-table #dt [value]="conversionesunidadesmedidas()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarConversionunidadmedida" [rowHover]="true" dataKey="id"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Conversiones Unidades Medidas" [showCurrentPageReport]="true"
-        *ngIf="!isLoading; else cargandoDatos">
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarConversionunidadmedida" [rowHover]="true"
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Conversiones Unidades Medidas"
+        [showCurrentPageReport]="true" *ngIf="!isLoading; else cargandoDatos">
 
         <ng-template #caption>
             <div class="flex items-center justify-between">
@@ -67,13 +70,9 @@
     </p-table>
 
     <ng-template #cargandoDatos>
-        <p-table [value]="skeletonRows"
-        [rows]="8"
-        [columns]="cols"
-        [paginator]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [showCurrentPageReport]="true"
-        >
+        <p-table [value]="skeletonRows" [rows]="8" [columns]="cols" [paginator]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [showCurrentPageReport]="true">
 
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -111,35 +110,35 @@
             </ng-template>
         </p-table>
     </ng-template>
-
-    <p-dialog [(visible)]="conversionunidadmedidaDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'NUEVA CONVERSIÓN UNIDAD MEDIDA' : 'ACTUALIZAR CONVERSIÓN UNIDAD MEDIDA'" [modal]="true">
-        <ng-template #content>
-            <div class="flex flex-col gap-6">
-                <div>
-                    <label for="nombre" class="block font-bold mb-3">Conversión Unidad Medida</label>
-                    <input type="text" pInputText [(ngModel)]="conversionunidadmedida.nombre" id="nombre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !conversionunidadmedida.nombre">Conversión Unidad Medida es
-                        requerido</small>
-                </div>
-
-                <div *ngIf="accion === 2">
-                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                    <p-select [(ngModel)]="conversionunidadmedida.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template #footer>
-            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
-                (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarConversionesUnidadesMedidas()"
-                [loading]="isLoading" />
-        </ng-template>
-
-    </p-dialog>
 </div>
+
+<p-dialog [(visible)]="conversionunidadmedidaDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'NUEVA CONVERSIÓN UNIDAD MEDIDA' : 'ACTUALIZAR CONVERSIÓN UNIDAD MEDIDA'" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="nombre" class="block font-bold mb-3">Conversión Unidad Medida</label>
+                <input type="text" pInputText [(ngModel)]="conversionunidadmedida.nombre" id="nombre" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !conversionunidadmedida.nombre">Conversión Unidad Medida es
+                    requerido</small>
+            </div>
+
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="conversionunidadmedida.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info"
+            (click)="guardarConversionesUnidadesMedidas()" [loading]="isLoading" />
+    </ng-template>
+
+</p-dialog>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
 

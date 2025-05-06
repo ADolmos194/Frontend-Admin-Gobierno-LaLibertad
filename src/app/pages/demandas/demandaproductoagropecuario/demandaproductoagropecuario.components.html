@@ -1,239 +1,315 @@
-    <div class="card">
-        <p-toast />
+<div class="card">
+    <p-toast />
 
-        <p-toolbar styleClass="mb-6">
-            <ng-template #start>
-                <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" />
-                <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
-            </ng-template>
-            <ng-template #end>
-                <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
-            </ng-template>
-        </p-toolbar>
+    <p-toolbar>
+        <ng-template #start>
+            <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" />
+            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
+        </ng-template>
+        <ng-template #end>
+            <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
+        </ng-template>
+    </p-toolbar>
+</div>
 
-        <p-table #dt [value]="demandasproductosagropecuarios()" [rows]="10" [columns]="cols" [paginator]="true"
-            [globalFilterFields]="['nombre_provincia_distrito','fecha_publicacion', 'nombre_producto', 'descripcion', 'nota', 'direccion', 'contacto', 'telefono', 'email', 'fecha_creacion', 'fecha_modificacion']"
-            [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDemandaProductosAgropecuarios"
-            [rowHover]="true" dataKey="id"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} demandas producto sagropecuarios"
-            [showCurrentPageReport]="true" *ngIf="!isLoading; else cargandoDatos">
-
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Lista de Demandas Productos Agropecuarios</h5>
-                    <p-iconfield>
-                        <p-inputicon styleClass="pi pi-search" />
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
-                    </p-iconfield>
-                </div>
-            </ng-template>
-
-            <ng-template #header let-columns>
-                <tr>
-                    <th>
-                        <p-tableHeaderCheckbox />
-                    </th>
-                    <th>Opciones</th>
-                    <th *ngFor="let col of columns" [pSortableColumn]="col.field">
-                        {{ col.header }}
-                        <p-sortIcon [field]="col.field" />
-                    </th>
-                </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-rowData let-columns="columns">
-                <tr>
-                    <td>
-                        <p-tableCheckbox [value]="rowData" />
-                    </td>
-                    <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            (click)="editarDemandaProductosAgropecuarios(rowData)" />
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                            (click)="eliminarDemandaProductosAgropecuarios(rowData)" />
-                    </td>
-                    <td *ngFor="let col of columns">
-                        <ng-container [ngSwitch]="col.field">
-                            <ng-container *ngSwitchCase="'estado_id'">
-                                <p-tag [value]="getEstado(rowData[col.field])"
-                                    [severity]="getEstadoSeverity(rowData[col.field])" />
-                            </ng-container>
-                            <ng-container *ngSwitchDefault>
-                                {{ rowData[col.field] }}
-                            </ng-container>
-                        </ng-container>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
-
-        <ng-template #cargandoDatos>
-            <p-table [value]="skeletonRows" [rows]="8" [columns]="cols" [paginator]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                [showCurrentPageReport]="true">
-
-                <ng-template #caption>
-                    <div class="flex items-center justify-between">
-                        <h5 class="m-0">Lista de Demandas Productos Agropecuarios</h5>
-                        <p-iconfield>
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input pInputText type="text" placeholder="Search..." />
-                        </p-iconfield>
-                    </div>
-                </ng-template>
-
-                <ng-template pTemplate="header" let-columns>
-                    <tr>
-                        <th></th>
-                        <th>Opciones</th>
-                        <th *ngFor="let col of columns">{{ col.header }}</th>
-                    </tr>
-                </ng-template>
-
-                <ng-template pTemplate="body" let-columns="columns">
-                    <tr>
-                        <td>
-                            <p-skeleton size="1.5rem" styleClass="border-round" />
-                        </td>
-
-                        <td style="display: flex; align-items: center; gap: 0.5rem;">
-                            <p-skeleton width="2rem" height="2rem" shape="circle" />
-                            <p-skeleton width="2rem" height="2rem" shape="circle" />
-                        </td>
-
-                        <td *ngFor="let col of columns">
-                            <p-skeleton width="100%" height="1rem" />
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+<div class="card">
+    <p-dataview #dv [value]="demandasproductosagropecuarios()" layout="grid" [rows]="3" [columns]="cols"
+        [paginator]="true" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Detalle Demandas Productos Agropecuarrio"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="[3, 6, 9]">
+        <ng-template #header>
+            <div class="flex justify-between items-center">
+                <h5 class="m-0">Lista de Detalle Demandas Productos Agropecuarrio</h5>
+                <p-selectbutton [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
+                    <ng-template #item let-option>
+                        <i class="pi pi-table"></i>
+                    </ng-template>
+                </p-selectbutton>
+            </div>
         </ng-template>
 
-        <p-dialog [(visible)]="demandaproductoagropecuarioDialogo" [style]="{ width: '450px' }"
-            [header]="accion === 1 ? 'NUEVA DEMANDA DE PRODUCTO AGROPECUARIO' : 'ACTUALIZAR DEMANDA DE PRODUCTO AGROPECUARIO'"
-            [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <div>
-                        <label for="provincia_id" class="block font-bold mb-3">Provincia</label>
-                        <p-select [(ngModel)]="demandaproductoagropecuario.provincia_id" inputId="provincia_id"
-                            [options]="opcionesProvinciasActivas" optionLabel="nombre" optionValue="id"
-                            placeholder="Seleccionar Provincia" appendTo="body" fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.provincia_id">Provincia es
-                            requerido</small>
+        <!-- Si está cargando, mostramos los Skeletons -->
+        <ng-template #grid let-data>
+            <div class="grid grid-cols-12 gap-4">
+                <ng-container *ngIf="isLoading; else dataLoaded">
+                    <div *ngFor="let i of [].constructor(3)"
+                        class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-4 p-3">
+                        <div class="p-5 border border-gray-200 bg-white rounded-lg shadow-sm flex flex-col h-full">
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div class="pb-5">
+                                    <p-skeleton width="100%" height="12rem" class="mb-3"></p-skeleton>
+                                </div>
+
+                                <div class="flex justify-between items-center mb-3">
+                                    <p-skeleton width="15rem" height="1.5rem"></p-skeleton>
+                                    <p-skeleton width="4rem" height="1.5rem"></p-skeleton>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="70%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="80%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="60%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="65%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="50%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="50%" height="1rem"></p-skeleton>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <p-skeleton width="15rem" height="1rem"></p-skeleton>
+                                        <p-skeleton width="70%" height="1rem"></p-skeleton>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="flex flex-wrap gap-2 mt-5">
+                                <p-skeleton width="5rem" height="2rem"></p-skeleton>
+                                <p-skeleton width="5rem" height="2rem"></p-skeleton>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="distrito_id" class="block font-bold mb-3">Distrito</label>
-                        <p-select [(ngModel)]="demandaproductoagropecuario.distrito_id" inputId="distrito_id"
-                            [options]="opcionesDistritosActivos" optionLabel="nombre" optionValue="id"
-                            placeholder="Seleccionar Distrito" appendTo="body" fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.distrito_id">Distrito es
-                            requerido</small>
+                </ng-container>
+
+
+                <!-- Cuando termina de cargar, mostramos los datos -->
+                <ng-template #dataLoaded>
+                    <div *ngFor="let demandaproductoagropecuario of data"
+                        class="col-span-12 sm:col-span-6 md:col-span-4 xl:col-span-4 p-3">
+                        <div
+                            class="p-5 border border-gray-200 bg-white rounded-lg shadow-sm flex flex-col h-full hover:shadow transition-shadow duration-200">
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div>
+                                    <img [src]="demandaproductoagropecuario.url_imagen"
+                                        alt="Imagen de {{ demandaproductoagropecuario.nombre_producto }}"
+                                        class="w-full h-48 object-cover rounded mb-3" />
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <div class="text-base font-semibold text-gray-900">
+                                        {{ demandaproductoagropecuario.nombre_provincia_distrito }}
+                                    </div>
+                                    <p-tag [value]="getEstado(demandaproductoagropecuario.estado_id)"
+                                        styleClass="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 border border-gray-200" />
+                                </div>
+
+                                <div class="text-gray-900 text-sm space-y-2">
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-calendar mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Publicado:</span> {{
+                                            demandaproductoagropecuario.fecha_publicacion }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-info-circle mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Descripción:</span> {{
+                                            demandaproductoagropecuario.descripcion }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-clipboard mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Nota:</span> {{ demandaproductoagropecuario.nota
+                                            }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-map-marker mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Dirección:</span> {{
+                                            demandaproductoagropecuario.direccion }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-user mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Contacto:</span> {{
+                                            demandaproductoagropecuario.contacto }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-phone mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Teléfono:</span> {{
+                                            demandaproductoagropecuario.telefono }}</span></div>
+                                    <div class="flex items-start text-justify"><i
+                                            class="pi pi-envelope mr-2 text-gray-500"></i><span><span
+                                                class="font-semibold">Email:</span> {{ demandaproductoagropecuario.email
+                                            }}</span></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 mt-5">
+                                <p-button label="Editar" icon="pi pi-pencil" [rounded]="false" [outlined]="true"
+                                    styleClass="text-sm text-gray-700 border-gray-300 hover:border-gray-500 hover:text-gray-900"
+                                    (click)="editarDemandaProductosAgropecuarios(demandaproductoagropecuario)" />
+                                <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [rounded]="false"
+                                    [outlined]="true"
+                                    styleClass="text-sm border-gray-300 hover:border-red-500 hover:text-red-600"
+                                    (click)="eliminarDemandaProductosAgropecuarios(demandaproductoagropecuario)" />
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="descripcion" class="block font-bold mb-3">Descripción</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.descripcion" id="descripcion"
-                            required fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.descripcion">La
-                            Descripción es requerido</small>
-                    </div>
+                </ng-template>
 
-                    <div>
-                        <label for="nota" class="block font-bold mb-3">Nota</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.nota" id="nota" required
-                            fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.nota">La Nota es
-                            requerido</small>
-                    </div>
+            </div>
+        </ng-template>
 
-                    <div>
-                        <label for="direccion" class="block font-bold mb-3">Dirección</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.direccion" id="direccion"
-                            required fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.direccion">La
-                            Dirección es requerido</small>
-                    </div>
+        <ng-template #emptymessage></ng-template>
+    </p-dataview>
+</div>
 
-                    <div>
-                        <label for="contacto" class="block font-bold mb-3">Contacto</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.contacto" id="contacto"
-                            required fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.contacto">El
-                            Contacto es requerido</small>
-                    </div>
+<p-drawer [(visible)]="demandaproductoagropecuarioDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'NUEVA DEMANDA DE PRODUCTO AGROPECUARIO' : 'ACTUALIZAR DEMANDA DE PRODUCTO AGROPECUARIO'"
+    [modal]="true" position="right">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="provincia_id" class="block font-bold mb-3">Provincia</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.provincia_id" inputId="provincia_id"
+                    [options]="opcionesProvinciasActivas" optionLabel="nombre" optionValue="id"
+                    placeholder="Seleccionar Provincia" appendTo="body" fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.provincia_id">Provincia es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="distrito_id" class="block font-bold mb-3">Distrito</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.distrito_id" inputId="distrito_id"
+                    [options]="opcionesDistritosActivos" optionLabel="nombre" optionValue="id"
+                    placeholder="Seleccionar Distrito" appendTo="body" fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.distrito_id">Distrito es
+                    requerido</small>
+            </div>
 
-                    <div>
-                        <label for="telefono" class="block font-bold mb-3">Teléfono</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.telefono" id="telefono"
-                            required fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.telefono">El
-                            Teléfono es requerido</small>
-                    </div>
-
-                    <div>
-                        <label for="email" class="block font-bold mb-3">Email</label>
-                        <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.email" id="email" required
-                            fluid />
-                        <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.email">El Email es
-                            requerido</small>
-                    </div>
-
-                    <div *ngIf="accion === 2">
-                        <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                        <p-select [(ngModel)]="demandaproductoagropecuario.estado_id" inputId="estado_id"
-                            [options]="opcionesEstado" optionLabel="nombre" optionValue="id"
-                            placeholder="Seleccionar estado" appendTo="body" fluid />
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
-                    (click)="ocultarDialogo()" />
-                <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info"
-                    (click)="guardarDemandaProductoAgropecuario()" [loading]="isLoading" />
-            </ng-template>
-
-        </p-dialog>
-    </div>
-
-    <p-confirmdialog [style]="{ width: '450px' }" />
+            <div>
+                <label for="url_imagen" class="block font-bold mb-3">Fecha publicación</label>
+                <p-datepicker [(ngModel)]="demandaproductoagropecuario.fecha_publicacion" [showIcon]="true"
+                    inputId="fecha_publicacion" dateFormat="yy-mm-dd" [fecha_publicacion]="'input'"></p-datepicker>
+            </div>
 
 
-    <style>
-        table {
-            width: 100%;
-            table-layout: auto;
-            border-collapse: collapse;
-        }
+            <div>
+                <p-toast />
+                <label for="imagen" class="block font-bold mb-3">Cargar Imagen</label>
+                <p-fileupload name="demo[]" url="https://www.primefaces.org/cdn/api/upload.php"
+                    (onUpload)="onFileUpload($event)" [multiple]="false" accept="image/*" maxFileSize="auto"
+                    mode="advanced" chooseLabel="Seleccionar Imagen" uploadLabel="Parchar">
+                    <ng-template #empty>
+                        <div>Drag and drop files to here to upload.</div>
+                    </ng-template>
+                    <ng-template #content>
+                        <ul *ngIf="uploadedFiles.length">
+                            <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes </li>
+                        </ul>
+                    </ng-template>
+                </p-fileupload>
 
-        td {
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: auto;
-        }
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.url_imagen">
+                    La imagen es requerida
+                </small>
+            </div>
 
-        th {
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: auto;
-        }
-    </style>
+            <div>
+                <label for="tipoproducto_id" class="block font-bold mb-3">Tipo producto</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.tipoproducto_id" inputId="tipoproducto_id"
+                    [options]="opcionesTipoProductosActivos" optionLabel="nombre" optionValue="id"
+                    placeholder="Seleccionar Tipo de Producto" appendTo="body" fluid />
+            </div>
+
+            <div>
+                <label for="producto_id" class="block font-bold mb-3">Producto</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.producto_id" inputId="producto_id"
+                    [options]="opcionesProductosActivos" optionLabel="nombre" optionValue="id"
+                    placeholder="Seleccionar Producto" appendTo="body" fluid />
+            </div>
 
 
-<!-- <div>
-                    <label for="producto_id" class="block font-bold mb-3">Producto</label>
-                    <p-select [(ngModel)]="demandaproductoagropecuario.producto_id" inputId="producto_id"
-                        [options]="opcionesProductosActivos" optionLabel="nombre" optionValue="id"
-                        placeholder="Seleccionar Producto" appendTo="body" fluid />
-                    <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.producto_id">Producto es
-                        requerido</small>
-                </div>
 
-                <div>
-                    <label for="imagen" class="block font-bold mb-3">Imagenes de productos</label>
-                    <input type="file" pInputText [(ngModel)]="demandaproductoagropecuario.imagen" id="imagen"
-                        required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.imagen">La
-                        Imagen es requerido</small>
-</div> -->
+            <div>
+                <label for="descripcion" class="block font-bold mb-3">Descripción</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.descripcion" id="descripcion"
+                    required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.descripcion">La
+                    Descripción es requerido</small>
+            </div>
+
+            <div>
+                <label for="nota" class="block font-bold mb-3">Nota</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.nota" id="nota" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.nota">La Nota es
+                    requerido</small>
+            </div>
+
+            <div>
+                <label for="direccion" class="block font-bold mb-3">Dirección</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.direccion" id="direccion"
+                    required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.direccion">La
+                    Dirección es requerido</small>
+            </div>
+
+            <div>
+                <label for="contacto" class="block font-bold mb-3">Contacto</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.contacto" id="contacto" required
+                    fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.contacto">El
+                    Contacto es requerido</small>
+            </div>
+
+            <div>
+                <label for="telefono" class="block font-bold mb-3">Teléfono</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.telefono" id="telefono" required
+                    fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.telefono">El
+                    Teléfono es requerido</small>
+            </div>
+
+            <div>
+                <label for="email" class="block font-bold mb-3">Email</label>
+                <input type="text" pInputText [(ngModel)]="demandaproductoagropecuario.email" id="email" required
+                    fluid />
+                <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.email">El Email es
+                    requerido</small>
+            </div>
+
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.estado_id" inputId="estado_id"
+                    [options]="opcionesEstado" optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado"
+                    appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info"
+            (click)="guardarDemandaProductoAgropecuario()" [loading]="isLoading" />
+    </ng-template>
+
+</p-drawer>
+
+
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+
+<style>
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+</style>

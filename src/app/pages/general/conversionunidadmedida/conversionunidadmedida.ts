@@ -131,7 +131,7 @@ export class Conversionunidadmedida implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         this.cols = [
-            { field: 'nombre', header: 'País' },
+            { field: 'nombre', header: 'Conversión de U.Medida' },
             { field: 'estado_id', header: 'Estado' },
             { field: 'fecha_creacion', header: 'Fecha creación' },
             { field: 'fecha_modificacion', header: 'Fecha modificación' }

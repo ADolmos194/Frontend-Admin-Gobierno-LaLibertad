@@ -10,7 +10,9 @@
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
         </ng-template>
     </p-toolbar>
+</div>
 
+<div class="card">
     <p-table #dt [value]="paises()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
         [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarPaises" [rowHover]="true" dataKey="id"
@@ -111,35 +113,36 @@
             </ng-template>
         </p-table>
     </ng-template>
-
-    <p-dialog [(visible)]="paisDialogo" [style]="{ width: '450px' }"
-        [header]="accion === 1 ? 'NUEVO PAÍS' : 'ACTUALIZAR PAÍS'" [modal]="true">
-        <ng-template #content>
-            <div class="flex flex-col gap-6">
-                <div>
-                    <label for="nombre" class="block font-bold mb-3">Nombre del País</label>
-                    <input type="text" pInputText [(ngModel)]="pais.nombre" id="nombre" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !pais.nombre">Nombre del País es
-                        requerido</small>
-                </div>
-
-                <div *ngIf="accion === 2">
-                    <label for="estado_id" class="block font-bold mb-3">Estado</label>
-                    <p-select [(ngModel)]="pais.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template #footer>
-            <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
-                (click)="ocultarDialogo()" />
-            <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPais()"
-                [loading]="isLoading" />
-        </ng-template>
-
-    </p-dialog>
 </div>
+
+
+<p-dialog [(visible)]="paisDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'NUEVO PAÍS' : 'ACTUALIZAR PAÍS'" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="nombre" class="block font-bold mb-3">Nombre del País</label>
+                <input type="text" pInputText [(ngModel)]="pais.nombre" id="nombre" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !pais.nombre">Nombre del País es
+                    requerido</small>
+            </div>
+
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="pais.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarPais()"
+            [loading]="isLoading" />
+    </ng-template>
+
+</p-dialog>
 
 <p-confirmdialog [style]="{ width: '450px' }" />
 
