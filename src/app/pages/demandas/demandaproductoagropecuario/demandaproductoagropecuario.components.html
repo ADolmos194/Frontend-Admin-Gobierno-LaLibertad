@@ -1,6 +1,6 @@
-<div class="card">
-    <p-toast />
+<p-toast />
 
+<div class="card">
     <p-toolbar>
         <ng-template #start>
             <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" />
@@ -101,7 +101,8 @@
                                 </div>
                                 <div class="flex justify-between items-center mb-3">
                                     <div class="text-base font-semibold text-gray-900">
-                                        {{ demandaproductoagropecuario.nombre_provincia_distrito }}
+                                        {{ demandaproductoagropecuario.nombre_producto}} {{
+                                        demandaproductoagropecuario.nombre_tipoproducto }}
                                     </div>
                                     <p-tag [value]="getEstado(demandaproductoagropecuario.estado_id)"
                                         styleClass="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 border border-gray-200" />
@@ -270,6 +271,14 @@
                     fluid />
                 <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.email">El Email es
                     requerido</small>
+            </div>
+
+            <div>
+                <label for="usuariosistema_id" class="block font-bold mb-3">Usuario</label>
+                <p-select [(ngModel)]="demandaproductoagropecuario.usuariosistema_id" inputId="usuariosistema_id"
+                    [options]="opcionesUsuarioSistemaActivos" optionLabel="nombre" optionValue="id"
+                    placeholder="Seleccionar Usuario" appendTo="body" fluid readonly/>
+
             </div>
 
             <div *ngIf="accion === 2">

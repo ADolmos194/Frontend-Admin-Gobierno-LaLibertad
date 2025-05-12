@@ -91,7 +91,7 @@ var datepicker_1 = require("primeng/datepicker");
 var fileupload_1 = require("primeng/fileupload");
 ;
 var DemandaProductoAgropecuario = /** @class */ (function () {
-    function DemandaProductoAgropecuario(demandaproductoagropecuarioService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService) {
+    function DemandaProductoAgropecuario(demandaproductoagropecuarioService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService, usuariosistemaService) {
         this.demandaproductoagropecuarioService = demandaproductoagropecuarioService;
         this.messageService = messageService;
         this.estadoService = estadoService;
@@ -100,6 +100,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
         this.productoService = productoService;
         this.tipoproductoService = tipoproductoService;
         this.imageUploadService = imageUploadService;
+        this.usuariosistemaService = usuariosistemaService;
         this.demandaproductoagropecuarioDialogo = false;
         this.demandasproductosagropecuarios = core_1.signal([]);
         this.fechaHoy = new Date();
@@ -120,6 +121,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
             contacto: '',
             telefono: '',
             email: '',
+            usuariosistema_id: 0,
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -132,6 +134,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
         this.opcionesDistritosActivos = [];
         this.opcionesProductosActivos = [];
         this.opcionesTipoProductosActivos = [];
+        this.opcionesUsuarioSistemaActivos = [];
         this.layout = 'grid';
         this.options = ['grid'];
         this.selectedFile = null;
@@ -161,24 +164,31 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
     };
     DemandaProductoAgropecuario.prototype.cargarDemandaProductosAgropecuarios = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var response, error_1;
+            var usuarioId, response, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.isLoading = true;
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios()];
+                        _a.trys.push([1, 3, 4, 5]);
+                        usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+                        if (!usuarioId) {
+                            throw new Error('Usuario no autenticado');
+                        }
+                        return [4 /*yield*/, this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios(usuarioId)];
                     case 2:
                         response = _a.sent();
                         this.demandasproductosagropecuarios.set(response);
-                        return [3 /*break*/, 4];
+                        return [3 /*break*/, 5];
                     case 3:
                         error_1 = _a.sent();
                         console.error('Error al cargar las demandas productos agropecuarios', error_1);
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 4:
+                        this.isLoading = false;
+                        return [7 /*endfinally*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -213,6 +223,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
     DemandaProductoAgropecuario.prototype.ngOnInit = function () {
         return __awaiter(this, void 0, void 0, function () {
             var error_3;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -232,6 +243,11 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')])];
                     case 5:
                         _a.sent();
+                        this.usuariosistemaService.getUsuarioSistema().then(function (response) {
+                            _this.opcionesUsuarioSistemaActivos = response;
+                            var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+                            _this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
+                        });
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
                     case 6:
                         _a.sent();
@@ -256,9 +272,12 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
+        var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+        this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
         this.demandaproductoagropecuarioDialogo = true;
     };
     DemandaProductoAgropecuario.prototype.limpiarDatos = function () {
+        var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
         this.demandaproductoagropecuario = {
             id: 0,
             provincia_id: 0,
@@ -276,6 +295,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
             contacto: '',
             telefono: '',
             email: '',
+            usuariosistema_id: usuarioId,
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -288,7 +308,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
     DemandaProductoAgropecuario.prototype.guardarDemandaProductoAgropecuario = function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var fechaPublicacion, uploadResp, DemandaProductoAgropecuarioParaEnviar, response, _c, error_4, msg;
+            var fechaPublicacion, uploadResp, usuarioSistemaId, DemandaProductoAgropecuarioParaEnviar, response, _c, error_4, msg;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -306,6 +326,10 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
                         this.demandaproductoagropecuario.url_imagen = uploadResp.secure_url;
                         _d.label = 3;
                     case 3:
+                        usuarioSistemaId = Number(localStorage.getItem('usuarioSistemaId'));
+                        if (!usuarioSistemaId) {
+                            throw new Error('Usuario no autenticado');
+                        }
                         DemandaProductoAgropecuarioParaEnviar = {
                             id: this.demandaproductoagropecuario.id,
                             provincia: this.demandaproductoagropecuario.provincia_id,
@@ -320,6 +344,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
                             contacto: this.demandaproductoagropecuario.contacto,
                             telefono: this.demandaproductoagropecuario.telefono,
                             email: this.demandaproductoagropecuario.email,
+                            usuariosistema: usuarioSistemaId,
                             estado: this.demandaproductoagropecuario.estado_id,
                             fecha_creacion: this.demandaproductoagropecuario.fecha_creacion,
                             fecha_modificacion: this.demandaproductoagropecuario.fecha_modificacion

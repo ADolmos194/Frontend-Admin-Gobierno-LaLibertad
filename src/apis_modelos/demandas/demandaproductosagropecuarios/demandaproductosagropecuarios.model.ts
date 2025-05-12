@@ -15,6 +15,7 @@ export interface DemandaProductosAgropecuarios {
     contacto: string;
     telefono: string;
     email: string;
+    usuariosistema_id: number;
     estado_id: number;
     fecha_creacion: string;
     fecha_modificacion: string;

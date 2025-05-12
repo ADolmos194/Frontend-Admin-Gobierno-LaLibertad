@@ -1,0 +1,78 @@
+<p-toast />
+<app-floating-configurator />
+<div class="min-h-screen grid grid-cols-1 md:grid-cols-2">
+
+    <div class="flex flex-col items-center justify-center  bg-white dark:bg-gray-900">
+        <div class="custom-login-wrapper">
+            <div class="w-full bg-white dark:bg-gray-900 shadow-md py-20 px-8 sm:px-20 custom-login-box">
+                <div class="text-center mb-8">
+                    <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenido a AGROCULTURA
+                        GOBPE!
+                    </div>
+                    <span class="text-muted-color font-medium">Inicia sesión para continuar</span>
+                </div>
+
+                <div class="mb-4">
+                    <label for="usuario"
+                        class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Usuario</label>
+                    <input pInputText id="usuario" type="text" placeholder="Ingrese usuario"
+                        class="w-full md:w-[30rem]" [(ngModel)]="usuariosistemalogin.usuario" required fluid />
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemalogin.usuario">Usuario es
+                        requerido</small>
+                </div>
+
+
+                <div>
+                    <label for="password"
+                        class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
+                    <p-password id="password" [(ngModel)]="usuariosistemalogin.password"
+                        placeholder="Ingrese contraseña" [toggleMask]="true" [fluid]="true"
+                        [feedback]="false"></p-password>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemalogin.password">Contraseña es
+                        requerido</small>
+                </div>
+
+
+                <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                    <div class="flex items-center">
+                    </div>
+                    <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Has olvidado
+                        tu contraseña?</span>
+                </div>
+                <p-button label="Iniciar sesión" styleClass="w-full" (onClick)="guardarUsuarioSistema()"
+                    [loading]="isLoading">
+                </p-button>
+
+                <p-divider />
+
+                <div class="flex justify-center mt-4">
+                    <p-button label="Crear cuenta" (onClick)="irACrearCuenta()" severity="warn"
+                        [loading]="isLoadingCrearCuenta">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden md:block bg-cover bg-center bg-no-repeat background-image-class"></div>
+</div>
+
+<style>
+    .background-image-class {
+        background-image: url('src/assets/imagen/agricultura.jpeg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+
+    .custom-login-wrapper {
+        border-radius: 56px;
+        padding: 0.3rem;
+        background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);
+    }
+
+    .custom-login-box {
+        border-radius: 53px;
+    }
+</style>

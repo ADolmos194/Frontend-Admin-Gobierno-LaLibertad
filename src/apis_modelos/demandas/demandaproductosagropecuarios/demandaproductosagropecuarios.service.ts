@@ -3,7 +3,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 
 export const url = api_url;
 export const endpoints = {
-    demandaproductosagropecuarios: "demandas/demandaproductosagropecuarios/",
+    demandaproductosagropecuarios: (id: number) => `demandas/demandaproductosagropecuarios/${id}/`,
     crearDemandaProductosAgropecuarios: "demandas/demandaproductosagropecuarios/crear/",
     actualizarDemandaProductosAgropecuarios: (id: number) => `demandas/demandaproductosagropecuarios/actualizar/${id}/`,
     eliminarDemandaProductosAgropecuarios: (id: number) => `demandas/demandaproductosagropecuarios/eliminar/${id}/`,
@@ -13,9 +13,9 @@ export const endpoints = {
     providedIn: 'root',
 })
 export class DemandaProductosAgropecuariosService {
-    async getDemandaProductosAgropecuarios() {
+    async getDemandaProductosAgropecuarios(id:number) {
         try {
-            const response = await axiosIns.get(`${url}${endpoints.demandaproductosagropecuarios}`);
+            const response = await axiosIns.get(`${url}${endpoints.demandaproductosagropecuarios(id)}`);
             return response.data.data;
         } catch (error) {
             console.error('Error al obtener las demandas productos agropecuarios:', error);

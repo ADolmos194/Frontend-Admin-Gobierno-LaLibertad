@@ -40,10 +40,13 @@ import { DistritosActivos } from '@/apis_modelos/general/distrito_servcie/distri
 import { DistritoService } from '@/apis_modelos/general/distrito_servcie/distrito.service';
 import { ProvinciasActivas } from '@/apis_modelos/general/provincia_service/provinciasactivas.model';
 import { ProvinciaService } from '@/apis_modelos/general/provincia_service/provincia.service';
+import { UsuariosSistemaActivos } from '@/apis_modelos/autenticacion/autenticacionactivos.model';
+import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
 import { ImageUploadService } from '@/apis_modelos/imagenes/imagenes.service';
 import { DatePicker } from 'primeng/datepicker';
 import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
 import { FileUpload } from 'primeng/fileupload';
+
 ;
 
 
@@ -98,6 +101,7 @@ interface ExportColumn {
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: "./demandaproductoagropecuario.components.html",
     providers: [MessageService, DemandaProductosAgropecuariosService, ConfirmationService, ImageUploadService]
+
 })
 
 
@@ -105,6 +109,7 @@ export class DemandaProductoAgropecuario implements OnInit {
     demandaproductoagropecuarioDialogo: boolean = false;
     demandasproductosagropecuarios = signal<DemandaProductosAgropecuarios[]>([]);
     fechaHoy: Date = new Date();
+
     demandaproductoagropecuario: DemandaProductosAgropecuarios = {
         id: 0,
         provincia_id: 0,
@@ -122,6 +127,7 @@ export class DemandaProductoAgropecuario implements OnInit {
         contacto: '',
         telefono: '',
         email: '',
+        usuariosistema_id: 0,
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
@@ -136,6 +142,7 @@ export class DemandaProductoAgropecuario implements OnInit {
     opcionesDistritosActivos: DistritosActivos[] = [];
     opcionesProductosActivos: ProductosActivos[] = [];
     opcionesTipoProductosActivos: TiposProductosActivos[] = [];
+    opcionesUsuarioSistemaActivos: UsuariosSistemaActivos[] = [];
 
     layout: string = 'grid';
 
@@ -162,11 +169,6 @@ export class DemandaProductoAgropecuario implements OnInit {
         }
     }
 
-
-
-
-
-
     estado = [
         { label: 'ACTIVO', value: 1 },
         { label: 'INACTIVO', value: 2 }
@@ -185,17 +187,24 @@ export class DemandaProductoAgropecuario implements OnInit {
         private productoService: ProductoService,
         private tipoproductoService: TipoProductoService,
         private imageUploadService: ImageUploadService,
+        private usuariosistemaService: UsuarioSistemaService
     ) { }
 
 
     async cargarDemandaProductosAgropecuarios() {
         this.isLoading = true;
         try {
-            const response: DemandaProductosAgropecuarios[] = await this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios();
-            this.demandasproductosagropecuarios.set(response);
+            const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+            if (!usuarioId) {
+                throw new Error('Usuario no autenticado');
+            }
 
+            const response: DemandaProductosAgropecuarios[] = await this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios(usuarioId);
+            this.demandasproductosagropecuarios.set(response);
         } catch (error) {
             console.error('Error al cargar las demandas productos agropecuarios', error);
+        } finally {
+            this.isLoading = false;
         }
     }
 
@@ -225,6 +234,11 @@ export class DemandaProductoAgropecuario implements OnInit {
             await Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')]);
             await Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')]);
             await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')]);
+            this.usuariosistemaService.getUsuarioSistema().then(response => {
+                this.opcionesUsuarioSistemaActivos = response;
+                const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+                this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
+            }),
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             await this.cargarDemandaProductosAgropecuarios();
             this.demandasProductosAgropecuarios = this.demandasproductosagropecuarios();
@@ -239,10 +253,14 @@ export class DemandaProductoAgropecuario implements OnInit {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
+        const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+        this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
         this.demandaproductoagropecuarioDialogo = true;
     }
 
     limpiarDatos() {
+        const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+
         this.demandaproductoagropecuario = {
             id: 0,
             provincia_id: 0,
@@ -260,11 +278,13 @@ export class DemandaProductoAgropecuario implements OnInit {
             contacto: '',
             telefono: '',
             email: '',
+            usuariosistema_id: usuarioId,
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: '',
         };
     }
+
 
     ocultarDialogo() {
         this.demandaproductoagropecuarioDialogo = false;
@@ -285,6 +305,11 @@ export class DemandaProductoAgropecuario implements OnInit {
                 this.demandaproductoagropecuario.url_imagen = uploadResp.secure_url;
             }
 
+            const usuarioSistemaId = Number(localStorage.getItem('usuarioSistemaId'));
+            if (!usuarioSistemaId) {
+                throw new Error('Usuario no autenticado');
+            }
+
             const DemandaProductoAgropecuarioParaEnviar = {
                 id: this.demandaproductoagropecuario.id,
                 provincia: this.demandaproductoagropecuario.provincia_id,
@@ -299,6 +324,7 @@ export class DemandaProductoAgropecuario implements OnInit {
                 contacto: this.demandaproductoagropecuario.contacto,
                 telefono: this.demandaproductoagropecuario.telefono,
                 email: this.demandaproductoagropecuario.email,
+                usuariosistema: usuarioSistemaId,
                 estado: this.demandaproductoagropecuario.estado_id,
                 fecha_creacion: this.demandaproductoagropecuario.fecha_creacion,
                 fecha_modificacion: this.demandaproductoagropecuario.fecha_modificacion
