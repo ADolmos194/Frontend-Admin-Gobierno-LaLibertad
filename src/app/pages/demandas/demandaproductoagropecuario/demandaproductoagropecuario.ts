@@ -296,7 +296,7 @@ export class DemandaProductoAgropecuario implements OnInit {
 
         this.isLoading = true;
         try {
-            // Asegurarse de que la fecha esté en formato correcto 'YYYY-MM-DD'
+
             const fechaPublicacion = new Date(this.demandaproductoagropecuario.fecha_publicacion);
             this.demandaproductoagropecuario.fecha_publicacion = fechaPublicacion.toISOString().split('T')[0];  // Formato 'YYYY-MM-DD'
 

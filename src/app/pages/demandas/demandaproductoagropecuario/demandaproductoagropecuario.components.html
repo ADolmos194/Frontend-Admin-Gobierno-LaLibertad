@@ -190,20 +190,9 @@
 
 
             <div>
-                <p-toast />
                 <label for="imagen" class="block font-bold mb-3">Cargar Imagen</label>
-                <p-fileupload name="demo[]" url="https://www.primefaces.org/cdn/api/upload.php"
-                    (onUpload)="onFileUpload($event)" [multiple]="false" accept="image/*" maxFileSize="auto"
-                    mode="advanced" chooseLabel="Seleccionar Imagen" uploadLabel="Parchar">
-                    <ng-template #empty>
-                        <div>Drag and drop files to here to upload.</div>
-                    </ng-template>
-                    <ng-template #content>
-                        <ul *ngIf="uploadedFiles.length">
-                            <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes </li>
-                        </ul>
-                    </ng-template>
-                </p-fileupload>
+
+                <p-fileupload name="demo[]" chooseLabel="Seleccionar imagen" chooseIcon="pi pi-upload"  (onUpload)="onFileUpload($event)" accept="image/*" maxFileSize="auto" mode="basic"/>
 
                 <small class="text-red-500" *ngIf="enviar && !demandaproductoagropecuario.url_imagen">
                     La imagen es requerida
