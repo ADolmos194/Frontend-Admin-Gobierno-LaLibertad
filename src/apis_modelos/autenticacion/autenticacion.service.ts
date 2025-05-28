@@ -21,7 +21,7 @@ export class UsuarioSistemaService {
         try {
             const response = await axiosIns.post(`${url}${endpoints.verificacionusuariosistema}`, data);
 
-            
+
             localStorage.setItem('usuarioSistemaId', response.data.data.id);
 
             return response.data;

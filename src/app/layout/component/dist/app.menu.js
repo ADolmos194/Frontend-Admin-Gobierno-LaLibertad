@@ -1,24 +1,21 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { AppMenuitem } from './app.menuitem';
-
-@Component({
-    selector: 'app-menu',
-    standalone: true,
-    imports: [CommonModule, AppMenuitem, RouterModule],
-    template: `<ul class="layout-menu">
-        <ng-container *ngFor="let item of model; let i = index">
-            <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
-            <li *ngIf="item.separator" class="menu-separator"></li>
-        </ng-container>
-    </ul> `
-})
-export class AppMenu {
-    model: MenuItem[] = [];
-
-    ngOnInit() {
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+exports.__esModule = true;
+exports.AppMenu = void 0;
+var core_1 = require("@angular/core");
+var common_1 = require("@angular/common");
+var router_1 = require("@angular/router");
+var app_menuitem_1 = require("./app.menuitem");
+var AppMenu = /** @class */ (function () {
+    function AppMenu() {
+        this.model = [];
+    }
+    AppMenu.prototype.ngOnInit = function () {
         this.model = [
             {
                 label: 'inicio',
@@ -64,5 +61,15 @@ export class AppMenu {
                 ]
             },
         ];
-    }
-}
+    };
+    AppMenu = __decorate([
+        core_1.Component({
+            selector: 'app-menu',
+            standalone: true,
+            imports: [common_1.CommonModule, app_menuitem_1.AppMenuitem, router_1.RouterModule],
+            template: "<ul class=\"layout-menu\">\n        <ng-container *ngFor=\"let item of model; let i = index\">\n            <li app-menuitem *ngIf=\"!item.separator\" [item]=\"item\" [index]=\"i\" [root]=\"true\"></li>\n            <li *ngIf=\"item.separator\" class=\"menu-separator\"></li>\n        </ng-container>\n    </ul> "
+        })
+    ], AppMenu);
+    return AppMenu;
+}());
+exports.AppMenu = AppMenu;
