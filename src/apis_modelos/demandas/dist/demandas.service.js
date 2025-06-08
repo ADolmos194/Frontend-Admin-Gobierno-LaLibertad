@@ -42,104 +42,104 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.DemandaProductosAgropecuariosService = exports.endpoints = exports.url = void 0;
+exports.DemandasService = exports.endpoints = exports.url = void 0;
 var core_1 = require("@angular/core");
 var axios_1 = require("@/plugins/axios");
 exports.url = axios_1.api_url;
 exports.endpoints = {
-    demandaproductosagropecuarios: function (id) { return "demandas/demandaproductosagropecuarios/" + id + "/"; },
-    crearDemandaProductosAgropecuarios: "demandas/demandaproductosagropecuarios/crear/",
-    actualizarDemandaProductosAgropecuarios: function (id) { return "demandas/demandaproductosagropecuarios/actualizar/" + id + "/"; },
-    eliminarDemandaProductosAgropecuarios: function (id) { return "demandas/demandaproductosagropecuarios/eliminar/" + id + "/"; }
+    demandas: function (id) { return "appdemandas/demandas/" + id + "/"; },
+    crearDemandas: "appdemandas/demandas/crear/",
+    actualizarDemandas: function (id) { return "appdemandas/demandas/actualizar/" + id + "/"; },
+    eliminarDemandas: function (id) { return "appdemandas/demandas/eliminar/" + id + "/"; }
 };
-var DemandaProductosAgropecuariosService = /** @class */ (function () {
-    function DemandaProductosAgropecuariosService() {
+var DemandasService = /** @class */ (function () {
+    function DemandasService() {
     }
-    DemandaProductosAgropecuariosService.prototype.getDemandaProductosAgropecuarios = function (id) {
+    DemandasService.prototype.getDemandas = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.demandaproductosagropecuarios(id))];
+                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.demandas(id))];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data.data];
                     case 2:
                         error_1 = _a.sent();
-                        console.error('Error al obtener las demandas productos agropecuarios:', error_1);
+                        console.error('Error al obtener las demandas', error_1);
                         throw error_1;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandaProductosAgropecuariosService.prototype.createDemandaProductosAgropecuarios = function (data) {
+    DemandasService.prototype.createDemandas = function (data) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.crearDemandaProductosAgropecuarios, data)];
+                        return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.crearDemandas, data)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_2 = _a.sent();
-                        console.error('Error al crear la Demanda productos agropecuarios:', error_2);
+                        console.error('Error al crear la demanda', error_2);
                         throw error_2;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandaProductosAgropecuariosService.prototype.updateDemandaProductosAgropecuarios = function (id, data) {
+    DemandasService.prototype.updateDemandas = function (id, data) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.put("" + exports.url + exports.endpoints.actualizarDemandaProductosAgropecuarios(id), data)];
+                        return [4 /*yield*/, axios_1.axiosIns.put("" + exports.url + exports.endpoints.actualizarDemandas(id), data)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_3 = _a.sent();
-                        console.error('Error al actualizar la Demanda productos agropecuarios:', error_3);
+                        console.error('Error al actualizar la demanda', error_3);
                         throw error_3;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandaProductosAgropecuariosService.prototype.deleteDemandaProductosAgropecuarios = function (id) {
+    DemandasService.prototype.deleteDemandas = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns["delete"]("" + exports.url + exports.endpoints.eliminarDemandaProductosAgropecuarios(id))];
+                        return [4 /*yield*/, axios_1.axiosIns["delete"]("" + exports.url + exports.endpoints.eliminarDemandas(id))];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_4 = _a.sent();
-                        console.error('Error al eliminar la Demanda productos agropecuarios:', error_4);
+                        console.error('Error al eliminar la demanda', error_4);
                         throw error_4;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandaProductosAgropecuariosService = __decorate([
+    DemandasService = __decorate([
         core_1.Injectable({
             providedIn: 'root'
         })
-    ], DemandaProductosAgropecuariosService);
-    return DemandaProductosAgropecuariosService;
+    ], DemandasService);
+    return DemandasService;
 }());
-exports.DemandaProductosAgropecuariosService = DemandaProductosAgropecuariosService;
+exports.DemandasService = DemandasService;

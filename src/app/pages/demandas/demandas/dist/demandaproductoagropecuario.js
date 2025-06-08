@@ -78,7 +78,7 @@ var confirmdialog_1 = require("primeng/confirmdialog");
 var dataview_1 = require("primeng/dataview");
 var tag_2 = require("primeng/tag");
 var selectbutton_1 = require("primeng/selectbutton");
-var demandaproductosagropecuarios_service_1 = require("@/apis_modelos/demandas/demandaproductosagropecuarios/demandaproductosagropecuarios.service");
+var demandas_service_1 = require("@/apis_modelos/demandas/demandas/demandas.service");
 var checkbox_1 = require("primeng/checkbox");
 var drawer_1 = require("primeng/drawer");
 var skeleton_1 = require("primeng/skeleton");
@@ -476,7 +476,7 @@ var DemandaProductoAgropecuario = /** @class */ (function () {
             ],
             schemas: [core_1.CUSTOM_ELEMENTS_SCHEMA],
             templateUrl: "./demandaproductoagropecuario.components.html",
-            providers: [api_1.MessageService, demandaproductosagropecuarios_service_1.DemandaProductosAgropecuariosService, api_1.ConfirmationService, imagenes_service_1.ImageUploadService]
+            providers: [api_1.MessageService, demandas_service_1.DemandaProductosAgropecuariosService, api_1.ConfirmationService, imagenes_service_1.ImageUploadService]
         })
     ], DemandaProductoAgropecuario);
     return DemandaProductoAgropecuario;

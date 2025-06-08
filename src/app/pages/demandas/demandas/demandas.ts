@@ -11,7 +11,6 @@ import { RatingModule } from 'primeng/rating';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
@@ -19,20 +18,13 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DataView } from 'primeng/dataview';
-import { Tag } from 'primeng/tag';
-import { SelectButton } from 'primeng/selectbutton';
-import { DemandaProductosAgropecuarios } from '@/apis_modelos/demandas/demandaproductosagropecuarios/demandaproductosagropecuarios.model';
-import { DemandaProductosAgropecuariosService } from '@/apis_modelos/demandas/demandaproductosagropecuarios/demandaproductosagropecuarios.service';
+import { Demandas } from '@/apis_modelos/demandas/demandas.models';
+import { DemandasService } from '@/apis_modelos/demandas/demandas.service';
 import { Estado } from '@/apis_modelos/general/estado_service/estado.model';
 import { CheckboxModule } from 'primeng/checkbox';
 import { EstadoService } from '@/apis_modelos/general/estado_service/estado.service';
 import { DrawerModule } from 'primeng/drawer';
 import { Skeleton } from 'primeng/skeleton';
-import { DividerModule } from 'primeng/divider';
-import { CarouselModule } from 'primeng/carousel';
-import { GalleriaModule } from 'primeng/galleria';
-import { CardModule } from 'primeng/card';
 import { ProductosActivos } from '@/apis_modelos/categorias/producto_service/productoactivo.model';
 import { ProductoService } from '@/apis_modelos/categorias/producto_service/producto.service';
 import { TipoProductoService } from '@/apis_modelos/categorias/tipoproducto_service/tipoproducto.service';
@@ -43,11 +35,10 @@ import { ProvinciaService } from '@/apis_modelos/general/provincia_service/provi
 import { UsuariosSistemaActivos } from '@/apis_modelos/autenticacion/autenticacionactivos.model';
 import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
 import { ImageUploadService } from '@/apis_modelos/imagenes/imagenes.service';
-import { DatePicker } from 'primeng/datepicker';
 import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
+import { TooltipModule } from 'primeng/tooltip';
 import { FileUpload } from 'primeng/fileupload';
-
-;
+import { CardModule } from 'primeng/card';
 
 
 interface Column {
@@ -63,11 +54,10 @@ interface ExportColumn {
 
 
 @Component({
-    selector: 'app-demnadaproductoagropecuario',
+    selector: 'app-demnadas',
     standalone: true,
     imports: [
         CommonModule,
-        DataView,
         TableModule,
         DrawerModule,
         FormsModule,
@@ -80,7 +70,6 @@ interface ExportColumn {
         InputTextModule,
         TextareaModule,
         SelectModule,
-        MultiSelectModule,
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
@@ -88,51 +77,49 @@ interface ExportColumn {
         InputIconModule,
         IconFieldModule,
         ConfirmDialogModule,
-        Tag,
-        SelectButton,
         Skeleton,
-        DividerModule,
-        CarouselModule,
-        GalleriaModule,
-        CardModule,
-        DatePicker,
-        FileUpload
+        TooltipModule,
+        FileUpload,CardModule
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    templateUrl: "./demandaproductoagropecuario.components.html",
-    providers: [MessageService, DemandaProductosAgropecuariosService, ConfirmationService, ImageUploadService]
+    templateUrl: "./demandas.components.html",
+    providers: [MessageService, DemandasService, ConfirmationService, ImageUploadService]
 
 })
 
 
-export class DemandaProductoAgropecuario implements OnInit {
-    demandaproductoagropecuarioDialogo: boolean = false;
-    demandasproductosagropecuarios = signal<DemandaProductosAgropecuarios[]>([]);
+export class DemandasGeneral implements OnInit {
+    demandasDialogo: boolean = false;
+    MostrarDemandaEcommerceDialogo: boolean = false;
+    accionMostrarDemandaEcommerceDialogo: number = 1;
+    demandas = signal<Demandas[]>([]);
     fechaHoy: Date = new Date();
-
-    demandaproductoagropecuario: DemandaProductosAgropecuarios = {
+    demanda: Demandas = {
         id: 0,
-        provincia_id: 0,
-        distrito_id: 0,
-        nombre_provincia_distrito: '',
-        fecha_publicacion: this.fechaHoy.toISOString().split('T')[0],
+        tiposdemandas_id: 0,
+        nombre_tipodemanda: '',
+        url_imagen: '',
+        fecha_publicacion: this.fechaHoy,
         tipoproducto_id: 0,
         nombre_tipoproducto: '',
         producto_id: 0,
         nombre_producto: '',
-        url_imagen: '',
         descripcion: '',
         nota: '',
+        localidadcaserio_id: 0,
+        nombre_localidadcaserio: '',
         direccion: '',
+        referencia_ubicacion: '',
         contacto: '',
         telefono: '',
         email: '',
         usuariosistema_id: 0,
+        nombre_usuario: '',
         estado_id: 1,
         fecha_creacion: '',
         fecha_modificacion: '',
     };
-    seleccionarDemandaProductosAgropecuarios!: DemandaProductosAgropecuarios[] | null;
+    seleccionarDemandas!: Demandas[] | null;
     enviar: boolean = false;
     isLoading: boolean = false;
     cols!: Column[];
@@ -144,19 +131,26 @@ export class DemandaProductoAgropecuario implements OnInit {
     opcionesTipoProductosActivos: TiposProductosActivos[] = [];
     opcionesUsuarioSistemaActivos: UsuariosSistemaActivos[] = [];
 
-    layout: string = 'grid';
 
-    options = ['grid'];
-
+    skeletonRows: any[] = new Array(8).fill({});
 
     selectedFile: File | null = null;
+    previewUrl: string | null = null;
 
     onImageSelected(event: any) {
-        const file = event.target.files[0];
-        if (file) {
-            this.selectedFile = file;
-        }
+    const file: File = event.files?.[0] || event.target.files?.[0];
+
+    if (file) {
+        this.selectedFile = file;
+
+        // Crear vista previa
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.previewUrl = reader.result as string;
+        };
+        reader.readAsDataURL(file);
     }
+}
 
     uploadedFiles: File[] = [];
 
@@ -179,7 +173,7 @@ export class DemandaProductoAgropecuario implements OnInit {
     }
 
     constructor(
-        private demandaproductoagropecuarioService: DemandaProductosAgropecuariosService,
+        private demandasService: DemandasService,
         private messageService: MessageService,
         private estadoService: EstadoService,
         private provinciaService: ProvinciaService,
@@ -191,18 +185,37 @@ export class DemandaProductoAgropecuario implements OnInit {
     ) { }
 
 
-    async cargarDemandaProductosAgropecuarios() {
+    async cargarDemandas() {
         this.isLoading = true;
+        this.cols = [
+            { field: 'nombre_tipodemanda', header: 'Tipo de demanda' },
+            { field: 'url_imagen', header: 'Imagen'},
+            { field: 'fecha_publicacion', header: 'Fecha de publicación' },
+            { field: 'nombre_tipoproducto', header: 'Tipo de producto' },
+            { field: 'nombre_producto', header: 'Producto' },
+            { field: 'descripcion', header: 'Descripción' },
+            { field: 'nota', header: 'Nota' },
+            { field: 'nombre_localidadcaserio', header: 'Localidad - Caserio' },
+            { field: 'direccion', header: 'Dirección' },
+            { field: 'referencia_ubicacion', header: 'Referencia de ubicación' },
+            { field: 'contacto', header: 'Contacto' },
+            { field: 'telefono', header: 'Telefono' },
+            { field: 'email', header: 'Email' },
+            { field: 'estado_id', header: 'Estado' },
+            { field: 'nombre_usuario', header: 'Usuario' },
+            { field: 'fecha_creacion', header: 'Fecha creación' },
+            { field: 'fecha_modificacion', header: 'Fecha modificación' }
+        ];
         try {
             const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
             if (!usuarioId) {
                 throw new Error('Usuario no autenticado');
             }
 
-            const response: DemandaProductosAgropecuarios[] = await this.demandaproductoagropecuarioService.getDemandaProductosAgropecuarios(usuarioId);
-            this.demandasproductosagropecuarios.set(response);
+            const response: Demandas[] = await this.demandasService.getDemandas(usuarioId);
+            this.demandas.set(response);
         } catch (error) {
-            console.error('Error al cargar las demandas productos agropecuarios', error);
+            console.error('Error al cargar las demandas', error);
         } finally {
             this.isLoading = false;
         }
@@ -224,7 +237,7 @@ export class DemandaProductoAgropecuario implements OnInit {
         }
     }
 
-    demandasProductosAgropecuarios: any[] = [];
+    demandasgeneral: any[] = [];
 
 
     async ngOnInit() {
@@ -237,11 +250,11 @@ export class DemandaProductoAgropecuario implements OnInit {
             this.usuariosistemaService.getUsuarioSistema().then(response => {
                 this.opcionesUsuarioSistemaActivos = response;
                 const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-                this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
+                this.demanda.usuariosistema_id = usuarioId;
             }),
-            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
-            await this.cargarDemandaProductosAgropecuarios();
-            this.demandasProductosAgropecuarios = this.demandasproductosagropecuarios();
+                await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
+            await this.cargarDemandas();
+            this.demandasgeneral = this.demandas();
         } catch (error) {
             console.error('Error al cargar los país:', error);
         } finally {
@@ -254,31 +267,46 @@ export class DemandaProductoAgropecuario implements OnInit {
         this.enviar = false;
         this.limpiarDatos();
         const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-        this.demandaproductoagropecuario.usuariosistema_id = usuarioId;
-        this.demandaproductoagropecuarioDialogo = true;
+        this.demanda.usuariosistema_id = usuarioId;
+        this.demandasDialogo = true;
+        this.selectedFile = null;
+        this.previewUrl = null;
     }
+
+    abrirDemandaEcommerceDialogo(demandaSeleccionada: Demandas) {
+    this.accionMostrarDemandaEcommerceDialogo = 1;
+    this.enviar = false;
+    this.demanda = { ...demandaSeleccionada };
+    this.MostrarDemandaEcommerceDialogo = true;
+}
+
+
+
 
     limpiarDatos() {
         const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
 
-        this.demandaproductoagropecuario = {
+        this.demanda = {
             id: 0,
-            provincia_id: 0,
-            distrito_id: 0,
-            nombre_provincia_distrito: '',
-            fecha_publicacion: this.fechaHoy.toISOString().split('T')[0],
+            tiposdemandas_id: 0,
+            nombre_tipodemanda: '',
+            url_imagen: '',
+            fecha_publicacion: this.fechaHoy,
             tipoproducto_id: 0,
             nombre_tipoproducto: '',
             producto_id: 0,
             nombre_producto: '',
-            url_imagen: '',
             descripcion: '',
             nota: '',
+            localidadcaserio_id: 0,
+            nombre_localidadcaserio: '',
             direccion: '',
+            referencia_ubicacion: '',
             contacto: '',
             telefono: '',
             email: '',
             usuariosistema_id: usuarioId,
+            nombre_usuario: '',
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: '',
@@ -287,22 +315,23 @@ export class DemandaProductoAgropecuario implements OnInit {
 
 
     ocultarDialogo() {
-        this.demandaproductoagropecuarioDialogo = false;
-        this.enviar = false;
+    this.demandasDialogo = false;
+    this.enviar = false;
+    this.selectedFile = null;
+    this.previewUrl = null;
     }
 
-    async guardarDemandaProductoAgropecuario() {
+
+    async guardarDemandas() {
         this.enviar = true;
 
         this.isLoading = true;
         try {
 
-            const fechaPublicacion = new Date(this.demandaproductoagropecuario.fecha_publicacion);
-            this.demandaproductoagropecuario.fecha_publicacion = fechaPublicacion.toISOString().split('T')[0];  // Formato 'YYYY-MM-DD'
 
             if (this.selectedFile) {
                 const uploadResp: any = await this.imageUploadService.uploadImage(this.selectedFile).toPromise();
-                this.demandaproductoagropecuario.url_imagen = uploadResp.secure_url;
+                this.demanda.url_imagen = uploadResp.secure_url;
             }
 
             const usuarioSistemaId = Number(localStorage.getItem('usuarioSistemaId'));
@@ -310,32 +339,33 @@ export class DemandaProductoAgropecuario implements OnInit {
                 throw new Error('Usuario no autenticado');
             }
 
-            const DemandaProductoAgropecuarioParaEnviar = {
-                id: this.demandaproductoagropecuario.id,
-                provincia: this.demandaproductoagropecuario.provincia_id,
-                distrito: this.demandaproductoagropecuario.distrito_id,
-                fecha_publicacion: this.demandaproductoagropecuario.fecha_publicacion,
-                tipoproducto: this.demandaproductoagropecuario.tipoproducto_id || null,
-                producto: this.demandaproductoagropecuario.producto_id || null,
-                url_imagen: this.demandaproductoagropecuario.url_imagen,
-                descripcion: this.demandaproductoagropecuario.descripcion,
-                nota: this.demandaproductoagropecuario.nota,
-                direccion: this.demandaproductoagropecuario.direccion,
-                contacto: this.demandaproductoagropecuario.contacto,
-                telefono: this.demandaproductoagropecuario.telefono,
-                email: this.demandaproductoagropecuario.email,
+            const DemandaParaEnviar = {
+                id: this.demanda.id,
+                tiposdemandas: this.demanda.tiposdemandas_id,
+                url_imagen: this.demanda.url_imagen,
+                fecha_publicacion: this.demanda.fecha_publicacion,
+                tipoproducto: this.demanda.tipoproducto_id,
+                producto: this.demanda.producto_id,
+                descripcion: this.demanda.descripcion,
+                nota: this.demanda.nota,
+                localidadcaserio: this.demanda.localidadcaserio_id,
+                direccion: this.demanda.direccion,
+                referencia_ubicacion: this.demanda.referencia_ubicacion,
+                contacto: this.demanda.contacto,
+                telefono: this.demanda.telefono,
+                email: this.demanda.email,
                 usuariosistema: usuarioSistemaId,
-                estado: this.demandaproductoagropecuario.estado_id,
-                fecha_creacion: this.demandaproductoagropecuario.fecha_creacion,
-                fecha_modificacion: this.demandaproductoagropecuario.fecha_modificacion
+                estado: this.demanda.estado_id,
+                fecha_creacion: this.demanda.fecha_creacion,
+                fecha_modificacion: this.demanda.fecha_modificacion
             };
 
             const response = this.accion === 1
-                ? await this.demandaproductoagropecuarioService.createDemandaProductosAgropecuarios(DemandaProductoAgropecuarioParaEnviar)
-                : await this.demandaproductoagropecuarioService.updateDemandaProductosAgropecuarios(this.demandaproductoagropecuario.id, DemandaProductoAgropecuarioParaEnviar);
+                ? await this.demandasService.createDemandas(DemandaParaEnviar)
+                : await this.demandasService.updateDemandas(this.demanda.id, DemandaParaEnviar);
 
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
-            await this.cargarDemandaProductosAgropecuarios();
+            await this.cargarDemandas();
             this.ocultarDialogo();
         } catch (error: any) {
             const msg = error?.response?.data?.message_user || 'Error inesperado';
@@ -367,19 +397,21 @@ export class DemandaProductoAgropecuario implements OnInit {
         }
     }
 
-    editarDemandaProductosAgropecuarios(demandaproductoagropecuario: DemandaProductosAgropecuarios) {
-        this.demandaproductoagropecuario = { ...demandaproductoagropecuario };
+    editarDemandas(demanda: Demandas) {
+        this.demanda = { ...demanda };
         this.accion = 2;
-        this.demandaproductoagropecuarioDialogo = true;
+        this.demandasDialogo = true;
+        this.previewUrl = this.demanda.url_imagen || null;
+        this.selectedFile = null;
     }
 
-    async eliminarDemandaProductosAgropecuarios(demandaproductoagropecuario: DemandaProductosAgropecuarios) {
-        const id = demandaproductoagropecuario.id;
+    async eliminarDemandas(demanda: Demandas) {
+        const id = demanda.id;
         this.isLoading = true;
         try {
-            const response = await this.demandaproductoagropecuarioService.deleteDemandaProductosAgropecuarios(id);
+            const response = await this.demandasService.deleteDemandas(id);
             this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarDemandaProductosAgropecuarios();
+            await this.cargarDemandas();
         } catch (error: any) {
             const msg = error?.response?.data?.message_user || 'Error inesperado';
             this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });

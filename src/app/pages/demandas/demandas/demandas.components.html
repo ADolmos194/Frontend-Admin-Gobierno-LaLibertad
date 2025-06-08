@@ -1,0 +1,343 @@
+<div class="card">
+    <p-toast />
+
+    <p-toolbar styleClass="mb-6">
+        <ng-template #start>
+            <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" pTooltip="Crear demanda"
+                tooltipPosition="top" />
+            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
+        </ng-template>
+        <ng-template #end>
+            <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
+        </ng-template>
+    </p-toolbar>
+</div>
+
+<div class="card">
+    <p-table #dt [value]="demandas()" [rows]="10" [columns]="cols" [paginator]="true"
+        [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDemandas" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} demandas" [showCurrentPageReport]="true"
+        *ngIf="!isLoading; else cargandoDatos">
+
+        <ng-template #caption>
+            <div class="flex items-center justify-between">
+                <h5 class="m-0">Lista de Demandas</h5>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template #header let-columns>
+            <tr>
+                <th>
+                    <p-tableheadercheckbox />
+                </th>
+                <th>Opciones</th>
+                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    {{ col.header }}
+                    <p-sorticon [field]="col.field" />
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+                <td>
+                    <p-tablecheckbox [value]="rowData" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        (click)="editarDemandas(rowData)" pTooltip="Editar demanda" tooltipPosition="top"></p-button>
+
+                    <p-button icon="pi pi-trash" class="mr-2" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="eliminarDemandas(rowData)" pTooltip="Eliminar demanda"
+                        tooltipPosition="top"></p-button>
+
+                    <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" pTooltip="Ver demanda"
+                        tooltipPosition="top" (onClick)="abrirDemandaEcommerceDialogo(rowData)"></p-button>
+
+                </td>
+                <td *ngFor="let col of columns">
+                    <ng-container [ngSwitch]="col.field">
+                        <ng-container *ngSwitchCase="'estado_id'">
+                            <p-tag [value]="getEstado(rowData[col.field])"
+                                [severity]="getEstadoSeverity(rowData[col.field])" />
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'url_imagen'">
+                            <img [src]="rowData[col.field]" alt="Imagen" width="80"
+                                style="object-fit: cover; border-radius: 4px;"
+                                *ngIf="rowData[col.field]; else sinImagen" />
+                            <ng-template #sinImagen>
+                                <span>Sin imagen</span>
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchDefault>
+                            {{ rowData[col.field] }}
+                        </ng-container>
+                    </ng-container>
+                </td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template #cargandoDatos>
+        <p-table [value]="skeletonRows" [rows]="6" [columns]="cols" [paginator]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [showCurrentPageReport]="true">
+
+            <ng-template #caption>
+                <div class="flex items-center justify-between">
+                    <h5 class="m-0">Lista de Demandas</h5>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" placeholder="Search..." />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th></th>
+                    <th>Opciones</th>
+                    <th *ngFor="let col of columns">{{ col.header }}</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-columns="columns">
+                <tr>
+                    <td>
+                        <p-skeleton size="1.5rem" styleClass="border-round" />
+                    </td>
+
+                    <td style="display: flex; align-items: center; gap: 0.5rem;">
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                        <p-skeleton width="2rem" height="2rem" shape="circle" />
+                    </td>
+
+                    <td *ngFor="let col of columns">
+                        <p-skeleton width="100%" height="1rem" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-template>
+</div>
+
+<p-dialog [(visible)]="demandasDialogo" [style]="{ width: '450px' }"
+    [header]="accion === 1 ? 'NUEVO DEMANDA' : 'ACTUALIZAR DEMANDA'" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+
+            <div>
+                <label for="estado_id" class="block font-bold mb-3">Tipo de
+                    demanda</label>
+                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+
+            <div>
+                <label for="imagen" class="block font-bold mb-3">Cargar
+                    Imagen</label>
+
+                <!-- Selector de imagen -->
+                <div class="upload-container">
+                    <p-fileupload name="imagen" chooseLabel="Seleccionar imagen" chooseIcon="pi pi-upload"
+                        (onSelect)="onImageSelected($event)" accept="image/*" maxFileSize="5000000" mode="basic"
+                        auto="true"></p-fileupload>
+
+                    <div *ngIf="previewUrl">
+                        <p>Vista previa de la imagen:</p>
+                        <img [src]="previewUrl" alt="Imagen seleccionada" width="200" />
+                    </div>
+                </div>
+
+                <!-- Validación -->
+                <small class="text-red-500" *ngIf="enviar && !previewUrl">
+                    La imagen es requerida
+                </small>
+            </div>
+
+            <div>
+                <label for="estado_id" class="block font-bold mb-3">Tipo de
+                    producto</label>
+                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+
+            <div>
+                <label for="estado_id" class="block font-bold mb-3">Producto</label>
+                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+
+            <div>
+                <label for="descripcion" class="block font-bold mb-3">Descripción</label>
+                <input type="text" pInputText [(ngModel)]="demanda.descripcion" id="descripcion" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.descripcion">Descripción es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="nota" class="block font-bold mb-3">Nota</label>
+                <input type="text" pInputText [(ngModel)]="demanda.nota" id="nota" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.nota">Nota
+                    es
+                    requerido</small>
+            </div>
+
+            <div>
+                <label for="estado_id" class="block font-bold mb-3">Localidad -
+                    Caserio</label>
+                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+
+            <div>
+                <label for="referencia_ubicacion" class="block font-bold mb-3">Referencia ubicación</label>
+                <input type="text" pInputText [(ngModel)]="demanda.referencia_ubicacion" id="referencia_ubicacion"
+                    required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.referencia_ubicacion">Referencia
+                    ubicación es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="contacto" class="block font-bold mb-3">Contacto</label>
+                <input type="text" pInputText [(ngModel)]="demanda.contacto" id="contacto" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.contacto">Contacto es
+                    requerido</small>
+            </div>
+            <div>
+                <label for="telefono" class="block font-bold mb-3">Teléfono</label>
+                <input type="text" pInputText [(ngModel)]="demanda.telefono" id="telefono" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.telefono">Teléfono es
+                    requerido</small>
+            </div>
+
+            <div>
+                <label for="email" class="block font-bold mb-3">Email</label>
+                <input type="text" pInputText [(ngModel)]="demanda.email" id="telefono" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.email">Email es
+                    requerido</small>
+            </div>
+
+            <div *ngIf="accion === 2">
+                <label for="estado_id" class="block font-bold mb-3">Estado</label>
+                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" variant="text" [raised]="true" severity="danger"
+            (click)="ocultarDialogo()" />
+        <p-button label="Guardar" icon="pi pi-check" [raised]="true" severity="info" (click)="guardarDemandas()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="MostrarDemandaEcommerceDialogo" [style]="{ width: '600px' }"
+    header="Visualizar Demanda Ecommerce" [modal]="true" [closable]="false" [dismissableMask]="true">
+    <div class="flex flex-col gap-4 text-[15px]">
+        <p-card class="shadow-md rounded-md">
+            <ng-template pTemplate="subtitle">
+                <div class="flex justify-between items-center text-[16px] font-semibold text-gray-900">
+                    <div>
+                        {{ demanda.nombre_tipodemanda }} - {{ demanda.nombre_producto }}
+                    </div>
+                    <div class="text-righ font-normal">
+                        Publicado el {{ demanda.fecha_publicacion | date: 'shortDate' }}
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="content">
+                <div class="flex flex-col gap-3 text-[15px]">
+
+                    <img *ngIf="demanda.url_imagen" [src]="demanda.url_imagen" alt="Imagen de la demanda"
+                        class="w-full max-h-[220px] object-cover rounded border" />
+
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-tag "></i>
+                        <span><strong>Tipo de producto:</strong> {{ demanda.nombre_tipoproducto }}</span>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <i class="pi pi-align-left  pt-1"></i>
+                        <span><strong>Descripción:</strong> {{ demanda.descripcion }}</span>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <i class="pi pi-info-circle  pt-1"></i>
+                        <span><strong>Nota:</strong> {{ demanda.nota }}</span>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <i class="pi pi-map-marker pt-1"></i>
+                        <span><strong>Ubicación:</strong> {{ demanda.direccion }}, {{ demanda.nombre_localidadcaserio
+                            }}</span>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <i class="pi pi-compass  pt-1"></i>
+                        <span><strong>Referencia:</strong> {{ demanda.referencia_ubicacion }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-user "></i>
+                        <span><strong>Contacto:</strong> {{ demanda.contacto }} - {{ demanda.telefono }} - {{
+                            demanda.email }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-check-circle"></i>
+                        <strong>Estado:</strong>
+                        <p-tag [value]="getEstado(demanda.estado_id)"
+                            [severity]="getEstadoSeverity(demanda.estado_id)"></p-tag>
+                    </div>
+
+                </div>
+            </ng-template>
+        </p-card>
+
+        <div class="flex justify-end">
+            <p-button label="Cerrar" icon="pi pi-times" (click)="MostrarDemandaEcommerceDialogo = false"
+                severity="secondary" class="mt-2" />
+        </div>
+    </div>
+</p-dialog>
+
+
+
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+<style>
+    table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: auto;
+    }
+
+    .upload-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+</style>
