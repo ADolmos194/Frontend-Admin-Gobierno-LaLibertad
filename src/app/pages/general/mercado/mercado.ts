@@ -99,6 +99,7 @@ export class Mercado implements OnInit {
         private mercadoService: MercadoService,
         private messageService: MessageService,
         private estadoService: EstadoService,
+        private confirmationService: ConfirmationService
     ) {}
 
     async cargarMercados() {
@@ -225,17 +226,30 @@ export class Mercado implements OnInit {
     }
 
     async eliminarMercado(mercado: Mercados) {
-        const id = mercado.id;
-        this.isLoading = true;
-        try {
-            const response = await this.mercadoService.deleteMercado(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarMercados();
-        } catch (error: any) {
-            const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar el mercado "${mercado.nombre}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.mercadoService.deleteMercado(mercado.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarMercados();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó el mercado' });
+            }
+        });
     }
 }

@@ -105,6 +105,7 @@ export class Departamento implements OnInit {
         private paisService: PaisService,
         private messageService: MessageService,
         private estadoService: EstadoService,
+        private confirmationService: ConfirmationService
     ) { }
 
     async cargarDepartamentos() {
@@ -236,18 +237,31 @@ export class Departamento implements OnInit {
     }
 
     async eliminarDepartamento(departamento: Departamentos) {
-        const id = departamento.id;
-        this.isLoading = true;
-        try {
-            const response = await this.departamentoService.deleteDepartamento(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarDepartamentos();
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMessage });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar el departamento "${departamento.nombre}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.departamentoService.deleteDepartamento(departamento.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarDepartamentos();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó el departamento' });
+            }
+        });
     }
 }
 

@@ -2,7 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, signal, ViewChild } from '@a
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
-import { FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -99,7 +99,8 @@ export class Pais implements OnInit {
         private paisService: PaisService,
         private messageService: MessageService,
         private estadoService: EstadoService,
-    ) {}
+        private confirmationService: ConfirmationService
+    ) { }
 
     async cargarPaises() {
         this.isLoading = true;
@@ -225,17 +226,31 @@ export class Pais implements OnInit {
     }
 
     async eliminarPais(pais: Paises) {
-        const id = pais.id;
-        this.isLoading = true;
-        try {
-            const response = await this.paisService.deletePais(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarPaises();
-        } catch (error: any) {
-            const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar el país "${pais.nombre}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.paisService.deletePais(pais.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarPaises();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó el país' });
+            }
+        });
     }
+
 }

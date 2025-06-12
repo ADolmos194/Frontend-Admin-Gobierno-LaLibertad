@@ -100,6 +100,7 @@ export class Conversionunidadmedida implements OnInit {
         private conversionunidadmedidaService: ConversionUnidadMedidaService,
         private messageService: MessageService,
         private estadoService: EstadoService,
+        private confirmationService: ConfirmationService
     ) {}
 
     async cargarConversionesUnidadesMedidas() {
@@ -226,17 +227,31 @@ export class Conversionunidadmedida implements OnInit {
     }
 
     async eliminarConversionUnidadMedida(conversionunidadmedida: ConversionesUnidadesMedidas) {
-        const id = conversionunidadmedida.id;
-        this.isLoading = true;
-        try {
-            const response = await this.conversionunidadmedidaService.deleteConversionUnidadMedida(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarConversionesUnidadesMedidas();
-        } catch (error: any) {
-            const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar la conversión de unidad de medida "${conversionunidadmedida.nombre}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.conversionunidadmedidaService.deleteConversionUnidadMedida(conversionunidadmedida.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarConversionesUnidadesMedidas();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la conversión de unidad de medida' });
+            }
+        });
     }
+
 }

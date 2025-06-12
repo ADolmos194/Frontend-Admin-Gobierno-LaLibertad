@@ -53,7 +53,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.Unidadmedida = void 0;
+exports.Departamento = void 0;
 var core_1 = require("@angular/core");
 var api_1 = require("primeng/api");
 var table_1 = require("primeng/table");
@@ -74,21 +74,24 @@ var tag_1 = require("primeng/tag");
 var inputicon_1 = require("primeng/inputicon");
 var iconfield_1 = require("primeng/iconfield");
 var confirmdialog_1 = require("primeng/confirmdialog");
-var unidadmedida_service_1 = require("@/apis_modelos/general/unidadmedida_service/unidadmedida.service");
+var departamento_service_1 = require("@/apis_modelos/general/departamento_service/departamento.service");
 var checkbox_1 = require("primeng/checkbox");
 var drawer_1 = require("primeng/drawer");
 var skeleton_1 = require("primeng/skeleton");
-var Unidadmedida = /** @class */ (function () {
-    function Unidadmedida(unidadmedidaService, messageService, estadoService, confirmationService) {
-        this.unidadmedidaService = unidadmedidaService;
+var Departamento = /** @class */ (function () {
+    function Departamento(departamentoService, paisService, messageService, estadoService, confirmationService) {
+        this.departamentoService = departamentoService;
+        this.paisService = paisService;
         this.messageService = messageService;
         this.estadoService = estadoService;
         this.confirmationService = confirmationService;
-        this.unidadmedidaDialogo = false;
-        this.unidadesmedidas = core_1.signal([]);
-        this.unidadmedida = {
+        this.departamentoDialogo = false;
+        this.departamentos = core_1.signal([]);
+        this.departamento = {
             id: 0,
             nombre: '',
+            pais_id: 0,
+            nombre_pais: '',
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
@@ -98,16 +101,17 @@ var Unidadmedida = /** @class */ (function () {
         this.cols = [];
         this.accion = 1;
         this.opcionesEstado = [];
+        this.opcionesPaisesActivos = [];
         this.skeletonRows = Array(8).fill({});
         this.estado = [
             { label: 'ACTIVO', value: 1 },
             { label: 'INACTIVO', value: 2 }
         ];
     }
-    Unidadmedida.prototype.onGlobalFilter = function (table, event) {
+    Departamento.prototype.onGlobalFilter = function (table, event) {
         table.filterGlobal(event.target.value, 'contains');
     };
-    Unidadmedida.prototype.cargarUnidadesMedidas = function () {
+    Departamento.prototype.cargarDepartamentos = function () {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_1;
             return __generator(this, function (_a) {
@@ -117,21 +121,21 @@ var Unidadmedida = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.unidadmedidaService.getUnidadesMedidas()];
+                        return [4 /*yield*/, this.departamentoService.getDepartamentos()];
                     case 2:
                         response = _a.sent();
-                        this.unidadesmedidas.set(response);
+                        this.departamentos.set(response);
                         return [3 /*break*/, 4];
                     case 3:
                         error_1 = _a.sent();
-                        console.error('Error al cargar los paises', error_1);
+                        console.error('Error al cargar los departamentos', error_1);
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    Unidadmedida.prototype.cargarOpciones = function (service, opcionesRef, label) {
+    Departamento.prototype.cargarOpciones = function (service, opcionesRef, label) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_2;
             return __generator(this, function (_a) {
@@ -158,7 +162,7 @@ var Unidadmedida = /** @class */ (function () {
             });
         });
     };
-    Unidadmedida.prototype.ngOnInit = function () {
+    Departamento.prototype.ngOnInit = function () {
         return __awaiter(this, void 0, void 0, function () {
             var error_3;
             return __generator(this, function (_a) {
@@ -166,56 +170,62 @@ var Unidadmedida = /** @class */ (function () {
                     case 0:
                         this.isLoading = true;
                         this.cols = [
-                            { field: 'nombre', header: 'Unidad de Medida' },
+                            { field: 'nombre', header: 'Departamento' },
+                            { field: 'nombre_pais', header: 'País' },
                             { field: 'estado_id', header: 'Estado' },
                             { field: 'fecha_creacion', header: 'Fecha creación' },
                             { field: 'fecha_modificacion', header: 'Fecha modificación' }
                         ];
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 4, 5, 6]);
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
+                        _a.trys.push([1, 5, 6, 7]);
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.paisService.getPaisesActivos.bind(this.paisService), this.opcionesPaisesActivos, 'paises activos')])];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, this.cargarUnidadesMedidas()];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
                     case 3:
                         _a.sent();
-                        return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.cargarDepartamentos()];
                     case 4:
-                        error_3 = _a.sent();
-                        console.error('Error al cargar las unidades medidas:', error_3);
-                        return [3 /*break*/, 6];
+                        _a.sent();
+                        return [3 /*break*/, 7];
                     case 5:
+                        error_3 = _a.sent();
+                        console.error('Error al cargar los departamentos:', error_3);
+                        return [3 /*break*/, 7];
+                    case 6:
                         this.isLoading = false;
                         return [7 /*endfinally*/];
-                    case 6: return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
     };
-    Unidadmedida.prototype.abrirNuevo = function () {
+    Departamento.prototype.abrirNuevo = function () {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
-        this.unidadmedidaDialogo = true;
+        this.departamentoDialogo = true;
     };
-    Unidadmedida.prototype.limpiarDatos = function () {
-        this.unidadmedida = {
+    Departamento.prototype.limpiarDatos = function () {
+        this.departamento = {
             id: 0,
             nombre: '',
+            pais_id: 0,
+            nombre_pais: '',
             estado_id: 1,
             fecha_creacion: '',
             fecha_modificacion: ''
         };
     };
-    Unidadmedida.prototype.ocultarDialogo = function () {
-        this.unidadmedidaDialogo = false;
+    Departamento.prototype.ocultarDialogo = function () {
+        this.departamentoDialogo = false;
         this.enviar = false;
     };
-    Unidadmedida.prototype.guardarUnidadMedida = function () {
+    Departamento.prototype.guardarDepartamento = function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var UnidadMedidaParaEnviar, response, _c, error_4, msg;
+            var DepartamentoParaEnviar, response, _c, error_4, msg;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -224,26 +234,27 @@ var Unidadmedida = /** @class */ (function () {
                         _d.label = 1;
                     case 1:
                         _d.trys.push([1, 7, 8, 9]);
-                        UnidadMedidaParaEnviar = {
-                            id: this.unidadmedida.id,
-                            nombre: this.unidadmedida.nombre,
-                            estado: this.unidadmedida.estado_id,
-                            fecha_creacion: this.unidadmedida.fecha_creacion,
-                            fecha_modificacion: this.unidadmedida.fecha_modificacion
+                        DepartamentoParaEnviar = {
+                            id: this.departamento.id,
+                            nombre: this.departamento.nombre,
+                            pais: this.departamento.pais_id,
+                            estado: this.departamento.estado_id,
+                            fecha_creacion: this.departamento.fecha_creacion,
+                            fecha_modificacion: this.departamento.fecha_modificacion
                         };
                         if (!(this.accion === 1)) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.unidadmedidaService.createUnidadMedida(UnidadMedidaParaEnviar)];
+                        return [4 /*yield*/, this.departamentoService.createDepartamento(DepartamentoParaEnviar)];
                     case 2:
                         _c = _d.sent();
                         return [3 /*break*/, 5];
-                    case 3: return [4 /*yield*/, this.unidadmedidaService.updateUnidadMedida(this.unidadmedida.id, UnidadMedidaParaEnviar)];
+                    case 3: return [4 /*yield*/, this.departamentoService.updateDepartamento(this.departamento.id, DepartamentoParaEnviar)];
                     case 4:
                         _c = _d.sent();
                         _d.label = 5;
                     case 5:
                         response = _c;
                         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user || 'Operación exitosa' });
-                        return [4 /*yield*/, this.cargarUnidadesMedidas()];
+                        return [4 /*yield*/, this.cargarDepartamentos()];
                     case 6:
                         _d.sent();
                         this.ocultarDialogo();
@@ -261,7 +272,7 @@ var Unidadmedida = /** @class */ (function () {
             });
         });
     };
-    Unidadmedida.prototype.getEstado = function (estado_id) {
+    Departamento.prototype.getEstado = function (estado_id) {
         switch (estado_id) {
             case 1:
                 return 'ACTIVO';
@@ -271,7 +282,7 @@ var Unidadmedida = /** @class */ (function () {
                 return 'ELIMINADO';
         }
     };
-    Unidadmedida.prototype.getEstadoSeverity = function (estado_id) {
+    Departamento.prototype.getEstadoSeverity = function (estado_id) {
         switch (estado_id) {
             case 1:
                 return 'success';
@@ -281,17 +292,17 @@ var Unidadmedida = /** @class */ (function () {
                 return 'info';
         }
     };
-    Unidadmedida.prototype.editarUnidadMedida = function (unidadmedida) {
-        this.unidadmedida = __assign({}, unidadmedida);
+    Departamento.prototype.editarDepartamento = function (departamento) {
+        this.departamento = __assign({}, departamento);
         this.accion = 2;
-        this.unidadmedidaDialogo = true;
+        this.departamentoDialogo = true;
     };
-    Unidadmedida.prototype.eliminarUnidadMedida = function (unidadmedida) {
+    Departamento.prototype.eliminarDepartamento = function (departamento) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 this.confirmationService.confirm({
-                    message: "\u00BFEst\u00E1s seguro de que deseas eliminar la unidad de medida \"" + unidadmedida.nombre + "\"?",
+                    message: "\u00BFEst\u00E1s seguro de que deseas eliminar el departamento \"" + departamento.nombre + "\"?",
                     header: 'Confirmar eliminación',
                     icon: 'pi pi-exclamation-triangle',
                     acceptLabel: 'Sí',
@@ -308,11 +319,11 @@ var Unidadmedida = /** @class */ (function () {
                                     _c.label = 1;
                                 case 1:
                                     _c.trys.push([1, 4, 5, 6]);
-                                    return [4 /*yield*/, this.unidadmedidaService.deleteUnidadMedida(unidadmedida.id)];
+                                    return [4 /*yield*/, this.departamentoService.deleteDepartamento(departamento.id)];
                                 case 2:
                                     response = _c.sent();
                                     this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-                                    return [4 /*yield*/, this.cargarUnidadesMedidas()];
+                                    return [4 /*yield*/, this.cargarDepartamentos()];
                                 case 3:
                                     _c.sent();
                                     return [3 /*break*/, 6];
@@ -329,16 +340,16 @@ var Unidadmedida = /** @class */ (function () {
                         });
                     }); },
                     reject: function () {
-                        _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la unidad de medida' });
+                        _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó el departamento' });
                     }
                 });
                 return [2 /*return*/];
             });
         });
     };
-    Unidadmedida = __decorate([
+    Departamento = __decorate([
         core_1.Component({
-            selector: 'app-unidadmedida',
+            selector: 'app-departamentos',
             standalone: true,
             imports: [
                 common_1.CommonModule,
@@ -364,10 +375,10 @@ var Unidadmedida = /** @class */ (function () {
                 skeleton_1.Skeleton
             ],
             schemas: [core_1.CUSTOM_ELEMENTS_SCHEMA],
-            templateUrl: './unidadmedida.components.html',
-            providers: [api_1.MessageService, unidadmedida_service_1.UnidadMedidaService, api_1.ConfirmationService]
+            templateUrl: './departamento.components.html',
+            providers: [api_1.MessageService, departamento_service_1.DepartamentoService, api_1.ConfirmationService]
         })
-    ], Unidadmedida);
-    return Unidadmedida;
+    ], Departamento);
+    return Departamento;
 }());
-exports.Unidadmedida = Unidadmedida;
+exports.Departamento = Departamento;

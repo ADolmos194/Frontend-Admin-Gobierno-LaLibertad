@@ -79,10 +79,11 @@ var checkbox_1 = require("primeng/checkbox");
 var drawer_1 = require("primeng/drawer");
 var skeleton_1 = require("primeng/skeleton");
 var Conversionunidadmedida = /** @class */ (function () {
-    function Conversionunidadmedida(conversionunidadmedidaService, messageService, estadoService) {
+    function Conversionunidadmedida(conversionunidadmedidaService, messageService, estadoService, confirmationService) {
         this.conversionunidadmedidaService = conversionunidadmedidaService;
         this.messageService = messageService;
         this.estadoService = estadoService;
+        this.confirmationService = confirmationService;
         this.conversionunidadmedidaDialogo = false;
         this.conversionesunidadesmedidas = core_1.signal([]);
         this.conversionunidadmedida = {
@@ -286,35 +287,52 @@ var Conversionunidadmedida = /** @class */ (function () {
         this.conversionunidadmedidaDialogo = true;
     };
     Conversionunidadmedida.prototype.eliminarConversionUnidadMedida = function (conversionunidadmedida) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var id, response, error_5, msg;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        id = conversionunidadmedida.id;
-                        this.isLoading = true;
-                        _c.label = 1;
-                    case 1:
-                        _c.trys.push([1, 4, 5, 6]);
-                        return [4 /*yield*/, this.conversionunidadmedidaService.deleteConversionUnidadMedida(id)];
-                    case 2:
-                        response = _c.sent();
-                        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-                        return [4 /*yield*/, this.cargarConversionesUnidadesMedidas()];
-                    case 3:
-                        _c.sent();
-                        return [3 /*break*/, 6];
-                    case 4:
-                        error_5 = _c.sent();
-                        msg = ((_b = (_a = error_5 === null || error_5 === void 0 ? void 0 : error_5.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-                        return [3 /*break*/, 6];
-                    case 5:
-                        this.isLoading = false;
-                        return [7 /*endfinally*/];
-                    case 6: return [2 /*return*/];
-                }
+            var _this = this;
+            return __generator(this, function (_a) {
+                this.confirmationService.confirm({
+                    message: "\u00BFEst\u00E1s seguro de que deseas eliminar la conversi\u00F3n de unidad de medida \"" + conversionunidadmedida.nombre + "\"?",
+                    header: 'Confirmar eliminación',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptLabel: 'Sí',
+                    rejectLabel: 'No',
+                    acceptButtonStyleClass: 'p-button-danger',
+                    rejectButtonStyleClass: 'p-button-secondary',
+                    accept: function () { return __awaiter(_this, void 0, void 0, function () {
+                        var response, error_5, msg;
+                        var _a, _b;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0:
+                                    this.isLoading = true;
+                                    _c.label = 1;
+                                case 1:
+                                    _c.trys.push([1, 4, 5, 6]);
+                                    return [4 /*yield*/, this.conversionunidadmedidaService.deleteConversionUnidadMedida(conversionunidadmedida.id)];
+                                case 2:
+                                    response = _c.sent();
+                                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                                    return [4 /*yield*/, this.cargarConversionesUnidadesMedidas()];
+                                case 3:
+                                    _c.sent();
+                                    return [3 /*break*/, 6];
+                                case 4:
+                                    error_5 = _c.sent();
+                                    msg = ((_b = (_a = error_5 === null || error_5 === void 0 ? void 0 : error_5.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
+                                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                                    return [3 /*break*/, 6];
+                                case 5:
+                                    this.isLoading = false;
+                                    return [7 /*endfinally*/];
+                                case 6: return [2 /*return*/];
+                            }
+                        });
+                    }); },
+                    reject: function () {
+                        _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la conversión de unidad de medida' });
+                    }
+                });
+                return [2 /*return*/];
             });
         });
     };
