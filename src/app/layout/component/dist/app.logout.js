@@ -24,7 +24,10 @@ var AppLogout = /** @class */ (function () {
     };
     AppLogout.prototype.logout = function () {
         this.usuariosistemaService.clearUsuario();
-        localStorage.removeItem('token'); // Limpia el token
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('usuarioSistemaId');
+        localStorage.removeItem('usuario');
         this.router.navigate(['/auth/login']);
     };
     AppLogout.prototype.ngOnDestroy = function () {

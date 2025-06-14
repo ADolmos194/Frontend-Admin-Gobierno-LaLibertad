@@ -25,7 +25,7 @@ export class AppLogout implements OnInit {
     usuario: string = 'Desconocido';
     private sub!: Subscription;
 
-    constructor(private router: Router, private usuariosistemaService: UsuarioSistemaService) {}
+    constructor(private router: Router, private usuariosistemaService: UsuarioSistemaService) { }
 
     ngOnInit() {
         this.sub = this.usuariosistemaService.usuario$.subscribe(usuario => {
@@ -35,9 +35,13 @@ export class AppLogout implements OnInit {
 
     logout() {
         this.usuariosistemaService.clearUsuario();
-        localStorage.removeItem('token'); // Limpia el token
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('usuarioSistemaId');
+        localStorage.removeItem('usuario');
         this.router.navigate(['/auth/login']);
     }
+
 
 
 

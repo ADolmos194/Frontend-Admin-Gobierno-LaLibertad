@@ -54,25 +54,36 @@ exports.endpoints = {
     actualizarUsuarioSistema: function (id) { return "autenticacion/usuariosistema/actualizar/" + id + "/"; },
     eliminarUsuarioSistema: function (id) { return "autenticacion/usuariosistema/eliminar/" + id + "/"; }
 };
+// ✅ Interceptor para agregar el token a cada petición
+axios_1.axiosIns.interceptors.request.use(function (config) {
+    var token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = "Bearer " + token;
+    }
+    return config;
+});
 var UsuarioSistemaService = /** @class */ (function () {
     function UsuarioSistemaService() {
         this.usuarioSubject = new rxjs_1.BehaviorSubject(localStorage.getItem('usuario'));
         this.usuario$ = this.usuarioSubject.asObservable();
     }
     UsuarioSistemaService.prototype.verificarUsuarioSistema = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            var response, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+        return __awaiter(this, void 0, Promise, function () {
+            var response, _a, access, refresh, id, usuario, error_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.verificacionusuariosistema, data)];
                     case 1:
-                        response = _a.sent();
-                        localStorage.setItem('usuarioSistemaId', response.data.data.id);
+                        response = _b.sent();
+                        _a = response.data.data, access = _a.access, refresh = _a.refresh, id = _a.id, usuario = _a.usuario;
+                        localStorage.setItem('usuarioSistemaId', id.toString());
+                        localStorage.setItem('access_token', access);
+                        localStorage.setItem('refresh_token', refresh);
                         return [2 /*return*/, response.data];
                     case 2:
-                        error_1 = _a.sent();
+                        error_1 = _b.sent();
                         console.error('Error al verificar el Usuario del Sistema:', error_1);
                         throw error_1;
                     case 3: return [2 /*return*/];

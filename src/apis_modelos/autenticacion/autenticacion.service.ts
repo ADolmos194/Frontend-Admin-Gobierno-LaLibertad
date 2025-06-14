@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { axiosIns, api_url } from '@/plugins/axios';
 import { BehaviorSubject } from 'rxjs';
-
+import { UsuariosSistemaLogin, UsuarioSistemaLoginResponse } from './autenticacionlogin.model';
 
 export const url = api_url;
 export const endpoints = {
@@ -12,17 +12,29 @@ export const endpoints = {
     eliminarUsuarioSistema: (id: number) => `autenticacion/usuariosistema/eliminar/${id}/`,
 };
 
+// ✅ Interceptor para agregar el token a cada petición
+axiosIns.interceptors.request.use(config => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 @Injectable({
     providedIn: 'root',
 })
 export class UsuarioSistemaService {
 
-    async verificarUsuarioSistema(data: any) {
+    async verificarUsuarioSistema(data: UsuariosSistemaLogin): Promise<{ status: string, message_user: string, data: UsuarioSistemaLoginResponse }> {
         try {
             const response = await axiosIns.post(`${url}${endpoints.verificacionusuariosistema}`, data);
 
+            const { access, refresh, id, usuario } = response.data.data;
 
-            localStorage.setItem('usuarioSistemaId', response.data.data.id);
+            localStorage.setItem('usuarioSistemaId', id.toString());
+            localStorage.setItem('access_token', access);
+            localStorage.setItem('refresh_token', refresh);
 
             return response.data;
         } catch (error) {
@@ -32,21 +44,17 @@ export class UsuarioSistemaService {
     }
 
     private usuarioSubject = new BehaviorSubject<string | null>(localStorage.getItem('usuario'));
-
     usuario$ = this.usuarioSubject.asObservable();
 
     setUsuario(usuario: string) {
-    localStorage.setItem('usuario', usuario);
-    this.usuarioSubject.next(usuario);
-}
-
+        localStorage.setItem('usuario', usuario);
+        this.usuarioSubject.next(usuario);
+    }
 
     clearUsuario() {
         localStorage.removeItem('usuario');
         this.usuarioSubject.next(null);
     }
-
-
 
     async getUsuarioSistema() {
         try {
@@ -58,7 +66,7 @@ export class UsuarioSistemaService {
         }
     }
 
-    async createUsuarioSistema(data : any) {
+    async createUsuarioSistema(data: any) {
         try {
             const response = await axiosIns.post(`${url}${endpoints.crearUsuarioSistema}`, data);
             return response.data;
@@ -67,7 +75,8 @@ export class UsuarioSistemaService {
             throw error;
         }
     }
-    async updateUsuarioSistema(id:number, data: any) {
+
+    async updateUsuarioSistema(id: number, data: any) {
         try {
             const response = await axiosIns.put(`${url}${endpoints.actualizarUsuarioSistema(id)}`, data);
             return response.data;
@@ -77,7 +86,7 @@ export class UsuarioSistemaService {
         }
     }
 
-    async deleteUsuarioSistema(id:number) {
+    async deleteUsuarioSistema(id: number) {
         try {
             const response = await axiosIns.delete(`${url}${endpoints.eliminarUsuarioSistema(id)}`);
             return response.data;

@@ -106,7 +106,8 @@ export class Producto implements OnInit {
         private productoService: ProductoService,
         private messageService: MessageService,
         private estadoService: EstadoService,
-        private tipoproductoService: TipoProductoService
+        private tipoproductoService: TipoProductoService,
+        private confirmationService: ConfirmationService
     ) {}
 
     async cargarProductos() {
@@ -244,17 +245,30 @@ export class Producto implements OnInit {
     }
 
     async eliminarProducto(producto: Productos) {
-        const id = producto.id;
-        this.isLoading = true;
-        try {
-            const response = await this.productoService.deleteProducto(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarProductos();
-        } catch (error: any) {
-            const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar el producto "${producto.nombre}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.productoService.deleteProducto(producto.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarProductos();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó el producto' });
+            }
+        });
     }
 }

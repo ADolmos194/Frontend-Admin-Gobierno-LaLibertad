@@ -9,7 +9,7 @@ var _axios = _interopRequireDefault(require("axios"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var api_url = 'http://127.0.0.1:8000/'; // 'https://backend-ecommerce-gobierno.onrender.com/' - 'http://127.0.0.1:8000/'
+var api_url = 'https://backend-ecommerce-gobierno.onrender.com/'; // 'https://backend-ecommerce-gobierno.onrender.com/' - 'http://127.0.0.1:8000/'
 
 exports.api_url = api_url;
 
