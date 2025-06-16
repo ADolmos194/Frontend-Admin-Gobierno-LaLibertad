@@ -10,24 +10,62 @@ exports.AppLogout = void 0;
 var core_1 = require("@angular/core");
 var button_1 = require("primeng/button");
 var AppLogout = /** @class */ (function () {
-    function AppLogout(router, usuariosistemaService) {
+    function AppLogout(router, usuariosistemaService, cookie) {
         this.router = router;
         this.usuariosistemaService = usuariosistemaService;
-        this.usuario = 'Desconocido';
+        this.cookie = cookie;
+        this.email = 'Desconocido';
     }
+    AppLogout.prototype.getTokenExpiration = function (token) {
+        try {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp ? payload.exp * 1000 : null;
+        }
+        catch (e) {
+            console.error('Token inválido', e);
+            return null;
+        }
+    };
     AppLogout.prototype.ngOnInit = function () {
         var _this = this;
-        this.sub = this.usuariosistemaService.usuario$.subscribe(function (usuario) {
-            var _a;
-            _this.usuario = (_a = usuario !== null && usuario !== void 0 ? usuario : localStorage.getItem('usuario')) !== null && _a !== void 0 ? _a : 'Desconocido';
-        });
+        var cookieData = this.cookie.get('userData');
+        var accessToken = this.cookie.get('access_token');
+        if (cookieData) {
+            try {
+                var user = JSON.parse(decodeURIComponent(cookieData));
+                this.email = user.email || 'Desconocido';
+            }
+            catch (e) {
+                console.error('Error al parsear userData', e);
+            }
+        }
+        if (accessToken) {
+            var exp = this.getTokenExpiration(accessToken);
+            if (exp) {
+                var now = Date.now();
+                var timeout = exp - now;
+                if (timeout > 0) {
+                    setTimeout(function () {
+                        _this.logout();
+                    }, timeout);
+                }
+                else {
+                    this.logout(); // token ya expirado
+                }
+            }
+            else {
+                this.logout(); // no se pudo leer expiración
+            }
+        }
+        else {
+            this.logout(); // sin token
+        }
     };
     AppLogout.prototype.logout = function () {
+        this.cookie["delete"]('access_token', '/');
+        this.cookie["delete"]('refresh_token', '/');
+        this.cookie["delete"]('userData', '/');
         this.usuariosistemaService.clearUsuario();
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('usuarioSistemaId');
-        localStorage.removeItem('usuario');
         this.router.navigate(['/auth/login']);
     };
     AppLogout.prototype.ngOnDestroy = function () {
@@ -39,7 +77,7 @@ var AppLogout = /** @class */ (function () {
             standalone: true,
             selector: 'app-logout',
             imports: [button_1.ButtonModule],
-            template: "\n    <div class=\"pt-2 flex gap-2 flex-wrap justify-start\">\n        <div>\n            <p class=\"text-lg font-semibold\">Usuario: {{ usuario }}</p>\n        </div>\n        <div>\n            <p-button severity=\"warn\" label=\"Cerrar Sesi\u00F3n\" (onClick)=\"logout()\"></p-button>\n        </div>\n    </div>",
+            template: "\n    <div class=\"pt-2 flex gap-2 flex-wrap justify-start\">\n        <div>\n            <p class=\"text-lg font-semibold\">{{ email }}</p>\n        </div>\n        <div>\n            <p-button severity=\"info\" label=\"Cerrar Sesi\u00F3n\" (onClick)=\"logout()\"></p-button>\n        </div>\n    </div>",
             host: {
                 "class": 'hidden absolute top-[3.25rem] right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
             }

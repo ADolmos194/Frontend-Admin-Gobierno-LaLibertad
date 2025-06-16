@@ -4,8 +4,13 @@ export interface UsuariosSistemaLogin {
 }
 
 export interface UsuarioSistemaLoginResponse {
-    id: number;
-    usuario: string;
+
     access: string;
     refresh: string;
+    userData: {
+        key_user: string;
+        usuario: string;
+        nombre: string;
+        email: string;
+    };
 }

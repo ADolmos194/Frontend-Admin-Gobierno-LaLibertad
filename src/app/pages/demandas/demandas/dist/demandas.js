@@ -83,7 +83,7 @@ var tooltip_1 = require("primeng/tooltip");
 var fileupload_1 = require("primeng/fileupload");
 var card_1 = require("primeng/card");
 var DemandasGeneral = /** @class */ (function () {
-    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService, usuariosistemaService) {
+    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService, cookieService) {
         this.demandasService = demandasService;
         this.messageService = messageService;
         this.estadoService = estadoService;
@@ -92,7 +92,7 @@ var DemandasGeneral = /** @class */ (function () {
         this.productoService = productoService;
         this.tipoproductoService = tipoproductoService;
         this.imageUploadService = imageUploadService;
-        this.usuariosistemaService = usuariosistemaService;
+        this.cookieService = cookieService;
         this.demandasDialogo = false;
         this.MostrarDemandaEcommerceDialogo = false;
         this.accionMostrarDemandaEcommerceDialogo = 1;
@@ -131,7 +131,8 @@ var DemandasGeneral = /** @class */ (function () {
         this.opcionesDistritosActivos = [];
         this.opcionesProductosActivos = [];
         this.opcionesTipoProductosActivos = [];
-        this.opcionesUsuarioSistemaActivos = [];
+        this.opcionesLocalidadCaserioActivo = [];
+        this.opcionesTipoDemandasActivas = [];
         this.skeletonRows = new Array(8).fill({});
         this.selectedFile = null;
         this.previewUrl = null;
@@ -167,6 +168,21 @@ var DemandasGeneral = /** @class */ (function () {
     DemandasGeneral.prototype.onGlobalFilter = function (table, event) {
         table.filterGlobal(event.target.value, 'contains');
     };
+    DemandasGeneral.prototype.getUsuarioSistemaId = function () {
+        var _a;
+        var rawUsuarioSistema = this.cookieService.get('userData');
+        if (rawUsuarioSistema && rawUsuarioSistema !== 'undefined') {
+            try {
+                var usuario = JSON.parse(decodeURIComponent(rawUsuarioSistema));
+                return (_a = usuario === null || usuario === void 0 ? void 0 : usuario.id) !== null && _a !== void 0 ? _a : null;
+            }
+            catch (e) {
+                console.error('Error al parsear userData en cookie', e);
+                return null;
+            }
+        }
+        return null;
+    };
     DemandasGeneral.prototype.cargarDemandas = function () {
         return __awaiter(this, void 0, void 0, function () {
             var usuarioId, response, error_1;
@@ -196,8 +212,8 @@ var DemandasGeneral = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, 4, 5]);
-                        usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-                        if (!usuarioId) {
+                        usuarioId = this.getUsuarioSistemaId();
+                        if (usuarioId === null) {
                             throw new Error('Usuario no autenticado');
                         }
                         return [4 /*yield*/, this.demandasService.getDemandas(usuarioId)];
@@ -246,15 +262,14 @@ var DemandasGeneral = /** @class */ (function () {
     };
     DemandasGeneral.prototype.ngOnInit = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var error_3;
-            var _this = this;
+            var usuarioId, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.isLoading = true;
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 8, 9, 10]);
+                        _a.trys.push([1, 10, 11, 12]);
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciasActivas, 'provincias activas')])];
                     case 2:
                         _a.sent();
@@ -267,27 +282,29 @@ var DemandasGeneral = /** @class */ (function () {
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')])];
                     case 5:
                         _a.sent();
-                        this.usuariosistemaService.getUsuarioSistema().then(function (response) {
-                            _this.opcionesUsuarioSistemaActivos = response;
-                            var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-                            _this.demanda.usuariosistema_id = usuarioId;
-                        });
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'localidad - caserio')])];
                     case 6:
                         _a.sent();
-                        return [4 /*yield*/, this.cargarDemandas()];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'tipos demandas activos')])];
                     case 7:
                         _a.sent();
-                        this.demandasgeneral = this.demandas();
-                        return [3 /*break*/, 10];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
                     case 8:
+                        _a.sent();
+                        usuarioId = this.getUsuarioSistemaId();
+                        return [4 /*yield*/, this.cargarDemandas()];
+                    case 9:
+                        _a.sent();
+                        this.demandasgeneral = this.demandas();
+                        return [3 /*break*/, 12];
+                    case 10:
                         error_3 = _a.sent();
                         console.error('Error al cargar los país:', error_3);
-                        return [3 /*break*/, 10];
-                    case 9:
+                        return [3 /*break*/, 12];
+                    case 11:
                         this.isLoading = false;
                         return [7 /*endfinally*/];
-                    case 10: return [2 /*return*/];
+                    case 12: return [2 /*return*/];
                 }
             });
         });
@@ -296,8 +313,10 @@ var DemandasGeneral = /** @class */ (function () {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
-        var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-        this.demanda.usuariosistema_id = usuarioId;
+        var usuarioId = this.getUsuarioSistemaId();
+        if (usuarioId) {
+            this.demanda.usuariosistema_id = usuarioId;
+        }
         this.demandasDialogo = true;
         this.selectedFile = null;
         this.previewUrl = null;
@@ -309,7 +328,7 @@ var DemandasGeneral = /** @class */ (function () {
         this.MostrarDemandaEcommerceDialogo = true;
     };
     DemandasGeneral.prototype.limpiarDatos = function () {
-        var usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+        var usuarioId = this.getUsuarioSistemaId();
         this.demanda = {
             id: 0,
             tiposdemandas_id: 0,
@@ -329,7 +348,7 @@ var DemandasGeneral = /** @class */ (function () {
             contacto: '',
             telefono: '',
             email: '',
-            usuariosistema_id: usuarioId,
+            usuariosistema_id: usuarioId || 0,
             nombre_usuario: '',
             estado_id: 1,
             fecha_creacion: '',
@@ -345,7 +364,7 @@ var DemandasGeneral = /** @class */ (function () {
     DemandasGeneral.prototype.guardarDemandas = function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var uploadResp, usuarioSistemaId, DemandaParaEnviar, response, _c, error_4, msg;
+            var uploadResp, usuarioId, DemandaParaEnviar, response, _c, error_4, msg;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -361,10 +380,7 @@ var DemandasGeneral = /** @class */ (function () {
                         this.demanda.url_imagen = uploadResp.secure_url;
                         _d.label = 3;
                     case 3:
-                        usuarioSistemaId = Number(localStorage.getItem('usuarioSistemaId'));
-                        if (!usuarioSistemaId) {
-                            throw new Error('Usuario no autenticado');
-                        }
+                        usuarioId = this.getUsuarioSistemaId();
                         DemandaParaEnviar = {
                             id: this.demanda.id,
                             tiposdemandas: this.demanda.tiposdemandas_id,
@@ -380,7 +396,7 @@ var DemandasGeneral = /** @class */ (function () {
                             contacto: this.demanda.contacto,
                             telefono: this.demanda.telefono,
                             email: this.demanda.email,
-                            usuariosistema: usuarioSistemaId,
+                            usuariosistema: usuarioId,
                             estado: this.demanda.estado_id,
                             fecha_creacion: this.demanda.fecha_creacion,
                             fecha_modificacion: this.demanda.fecha_modificacion

@@ -55,7 +55,7 @@ export class Login {
             const response = await this.usuariosistemaService.verificarUsuarioSistema(UsuarioSistemaParaEnviar);
 
             if (response.status === "success") {
-                this.usuariosistemaService.setUsuario(response.data.usuario);
+                this.usuariosistemaService.setUsuario(response.data.userData.usuario);
             }
 
 

@@ -32,13 +32,15 @@ import { DistritosActivos } from '@/apis_modelos/general/distrito_servcie/distri
 import { DistritoService } from '@/apis_modelos/general/distrito_servcie/distrito.service';
 import { ProvinciasActivas } from '@/apis_modelos/general/provincia_service/provinciasactivas.model';
 import { ProvinciaService } from '@/apis_modelos/general/provincia_service/provincia.service';
-import { UsuariosSistemaActivos } from '@/apis_modelos/autenticacion/autenticacionactivos.model';
 import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
 import { ImageUploadService } from '@/apis_modelos/imagenes/imagenes.service';
 import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileUpload } from 'primeng/fileupload';
 import { CardModule } from 'primeng/card';
+import { CookieService } from 'ngx-cookie-service';
+import { LocalidadCaserioActivos } from '@/apis_modelos/general/localidadcaserio_service/localidadcaserioactivos.model';
+import { TipoDemandasActivas } from '@/apis_modelos/demandas/tipodemandasactivos.model';
 
 
 interface Column {
@@ -79,7 +81,7 @@ interface ExportColumn {
         ConfirmDialogModule,
         Skeleton,
         TooltipModule,
-        FileUpload,CardModule
+        FileUpload, CardModule
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     templateUrl: "./demandas.components.html",
@@ -129,8 +131,9 @@ export class DemandasGeneral implements OnInit {
     opcionesDistritosActivos: DistritosActivos[] = [];
     opcionesProductosActivos: ProductosActivos[] = [];
     opcionesTipoProductosActivos: TiposProductosActivos[] = [];
-    opcionesUsuarioSistemaActivos: UsuariosSistemaActivos[] = [];
 
+    opcionesLocalidadCaserioActivo: LocalidadCaserioActivos[] = [];
+    opcionesTipoDemandasActivas: TipoDemandasActivas[] = [];
 
     skeletonRows: any[] = new Array(8).fill({});
 
@@ -138,19 +141,19 @@ export class DemandasGeneral implements OnInit {
     previewUrl: string | null = null;
 
     onImageSelected(event: any) {
-    const file: File = event.files?.[0] || event.target.files?.[0];
+        const file: File = event.files?.[0] || event.target.files?.[0];
 
-    if (file) {
-        this.selectedFile = file;
+        if (file) {
+            this.selectedFile = file;
 
-        // Crear vista previa
-        const reader = new FileReader();
-        reader.onload = () => {
-            this.previewUrl = reader.result as string;
-        };
-        reader.readAsDataURL(file);
+            // Crear vista previa
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.previewUrl = reader.result as string;
+            };
+            reader.readAsDataURL(file);
+        }
     }
-}
 
     uploadedFiles: File[] = [];
 
@@ -181,15 +184,28 @@ export class DemandasGeneral implements OnInit {
         private productoService: ProductoService,
         private tipoproductoService: TipoProductoService,
         private imageUploadService: ImageUploadService,
-        private usuariosistemaService: UsuarioSistemaService
+        private cookieService: CookieService
     ) { }
 
+    getUsuarioSistemaId(): number | null {
+        const rawUsuarioSistema = this.cookieService.get('userData');
+        if (rawUsuarioSistema && rawUsuarioSistema !== 'undefined') {
+            try {
+                const usuario = JSON.parse(decodeURIComponent(rawUsuarioSistema));
+                return usuario?.id ?? null;
+            } catch (e) {
+                console.error('Error al parsear userData en cookie', e);
+                return null;
+            }
+        }
+        return null;
+    }
 
     async cargarDemandas() {
         this.isLoading = true;
         this.cols = [
             { field: 'nombre_tipodemanda', header: 'Tipo de demanda' },
-            { field: 'url_imagen', header: 'Imagen'},
+            { field: 'url_imagen', header: 'Imagen' },
             { field: 'fecha_publicacion', header: 'Fecha de publicación' },
             { field: 'nombre_tipoproducto', header: 'Tipo de producto' },
             { field: 'nombre_producto', header: 'Producto' },
@@ -207,11 +223,10 @@ export class DemandasGeneral implements OnInit {
             { field: 'fecha_modificacion', header: 'Fecha modificación' }
         ];
         try {
-            const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-            if (!usuarioId) {
+            const usuarioId = this.getUsuarioSistemaId();
+            if (usuarioId === null) {
                 throw new Error('Usuario no autenticado');
             }
-
             const response: Demandas[] = await this.demandasService.getDemandas(usuarioId);
             this.demandas.set(response);
         } catch (error) {
@@ -247,12 +262,10 @@ export class DemandasGeneral implements OnInit {
             await Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')]);
             await Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')]);
             await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')]);
-            this.usuariosistemaService.getUsuarioSistema().then(response => {
-                this.opcionesUsuarioSistemaActivos = response;
-                const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-                this.demanda.usuariosistema_id = usuarioId;
-            }),
-                await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
+            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'localidad - caserio')]);
+            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'tipos demandas activos')]);
+            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
+            const usuarioId = this.getUsuarioSistemaId();
             await this.cargarDemandas();
             this.demandasgeneral = this.demandas();
         } catch (error) {
@@ -266,25 +279,25 @@ export class DemandasGeneral implements OnInit {
         this.accion = 1;
         this.enviar = false;
         this.limpiarDatos();
-        const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
-        this.demanda.usuariosistema_id = usuarioId;
+        const usuarioId = this.getUsuarioSistemaId();
+        if (usuarioId) {
+            this.demanda.usuariosistema_id = usuarioId;
+        }
         this.demandasDialogo = true;
         this.selectedFile = null;
         this.previewUrl = null;
     }
 
     abrirDemandaEcommerceDialogo(demandaSeleccionada: Demandas) {
-    this.accionMostrarDemandaEcommerceDialogo = 1;
-    this.enviar = false;
-    this.demanda = { ...demandaSeleccionada };
-    this.MostrarDemandaEcommerceDialogo = true;
-}
-
-
-
+        this.accionMostrarDemandaEcommerceDialogo = 1;
+        this.enviar = false;
+        this.demanda = { ...demandaSeleccionada };
+        this.MostrarDemandaEcommerceDialogo = true;
+    }
 
     limpiarDatos() {
-        const usuarioId = Number(localStorage.getItem('usuarioSistemaId'));
+
+        const usuarioId = this.getUsuarioSistemaId();
 
         this.demanda = {
             id: 0,
@@ -305,7 +318,7 @@ export class DemandasGeneral implements OnInit {
             contacto: '',
             telefono: '',
             email: '',
-            usuariosistema_id: usuarioId,
+            usuariosistema_id: usuarioId || 0,
             nombre_usuario: '',
             estado_id: 1,
             fecha_creacion: '',
@@ -315,10 +328,10 @@ export class DemandasGeneral implements OnInit {
 
 
     ocultarDialogo() {
-    this.demandasDialogo = false;
-    this.enviar = false;
-    this.selectedFile = null;
-    this.previewUrl = null;
+        this.demandasDialogo = false;
+        this.enviar = false;
+        this.selectedFile = null;
+        this.previewUrl = null;
     }
 
 
@@ -334,10 +347,7 @@ export class DemandasGeneral implements OnInit {
                 this.demanda.url_imagen = uploadResp.secure_url;
             }
 
-            const usuarioSistemaId = Number(localStorage.getItem('usuarioSistemaId'));
-            if (!usuarioSistemaId) {
-                throw new Error('Usuario no autenticado');
-            }
+            const usuarioId = this.getUsuarioSistemaId();
 
             const DemandaParaEnviar = {
                 id: this.demanda.id,
@@ -354,7 +364,7 @@ export class DemandasGeneral implements OnInit {
                 contacto: this.demanda.contacto,
                 telefono: this.demanda.telefono,
                 email: this.demanda.email,
-                usuariosistema: usuarioSistemaId,
+                usuariosistema: usuarioId,
                 estado: this.demanda.estado_id,
                 fecha_creacion: this.demanda.fecha_creacion,
                 fecha_modificacion: this.demanda.fecha_modificacion

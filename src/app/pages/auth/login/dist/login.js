@@ -98,7 +98,7 @@ var Login = /** @class */ (function () {
                     case 2:
                         response = _c.sent();
                         if (response.status === "success") {
-                            this.usuariosistemaService.setUsuario(response.data.usuario);
+                            this.usuariosistemaService.setUsuario(response.data.userData.usuario);
                         }
                         this.messageService.add({
                             severity: 'success',

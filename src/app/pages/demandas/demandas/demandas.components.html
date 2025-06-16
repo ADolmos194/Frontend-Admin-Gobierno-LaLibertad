@@ -136,10 +136,10 @@
         <div class="flex flex-col gap-6">
 
             <div>
-                <label for="estado_id" class="block font-bold mb-3">Tipo de
+                <label for="tiposdemandas_id" class="block font-bold mb-3">Tipo de
                     demanda</label>
-                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                <p-select [(ngModel)]="demanda.tiposdemandas_id" inputId="tiposdemandas_id" [options]="opcionesTipoDemandasActivas"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar tipo de demanda" appendTo="body" fluid />
             </div>
 
             <div>
@@ -165,16 +165,16 @@
             </div>
 
             <div>
-                <label for="estado_id" class="block font-bold mb-3">Tipo de
+                <label for="tiposdemandas_id" class="block font-bold mb-3">Tipo de
                     producto</label>
-                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                <p-select [(ngModel)]="demanda.tiposdemandas_id" inputId="tiposdemandas_id" [options]="opcionesTipoProductosActivos"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar tipo de producto" appendTo="body" fluid />
             </div>
 
             <div>
-                <label for="estado_id" class="block font-bold mb-3">Producto</label>
-                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                <label for="producto_id" class="block font-bold mb-3">Producto</label>
+                <p-select [(ngModel)]="demanda.producto_id" inputId="producto_id" [options]="opcionesProductosActivos"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar producto" appendTo="body" fluid />
             </div>
 
             <div>
@@ -192,10 +192,10 @@
             </div>
 
             <div>
-                <label for="estado_id" class="block font-bold mb-3">Localidad -
+                <label for="localidadcaserio_id" class="block font-bold mb-3">Localidad -
                     Caserio</label>
-                <p-select [(ngModel)]="demanda.estado_id" inputId="estado_id" [options]="opcionesEstado"
-                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado" appendTo="body" fluid />
+                <p-select [(ngModel)]="demanda.localidadcaserio_id" inputId="localidadcaserio_id" [options]="opcionesLocalidadCaserioActivo"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar localidad - caserio" appendTo="body" fluid />
             </div>
 
             <div>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { axiosIns, api_url } from '@/plugins/axios';
 import { BehaviorSubject } from 'rxjs';
 import { UsuariosSistemaLogin, UsuarioSistemaLoginResponse } from './autenticacionlogin.model';
+import { CookieService } from 'ngx-cookie-service';
 
 export const url = api_url;
 export const endpoints = {
@@ -12,29 +13,50 @@ export const endpoints = {
     eliminarUsuarioSistema: (id: number) => `autenticacion/usuariosistema/eliminar/${id}/`,
 };
 
-// ✅ Interceptor para agregar el token a cada petición
-axiosIns.interceptors.request.use(config => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
 @Injectable({
     providedIn: 'root',
 })
 export class UsuarioSistemaService {
+    private usuarioSubject = new BehaviorSubject<string | null>(null);
+    usuario$ = this.usuarioSubject?.asObservable();
+
+    constructor(private cookie: CookieService) {
+        const rawUsuarioSistema = this.cookie.get('userData');
+        if (rawUsuarioSistema) {
+            try {
+                const user = JSON.parse(decodeURIComponent(rawUsuarioSistema));
+                if (user?.email) {
+                    this.setUsuario(user.email);
+                } else {
+                    this.clearUsuario();
+                }
+            } catch (e) {
+                console.error('Error al parsear usuarioSistema', e);
+                this.clearUsuario();
+            }
+        } else {
+            this.clearUsuario();
+        }
+    }
+
 
     async verificarUsuarioSistema(data: UsuariosSistemaLogin): Promise<{ status: string, message_user: string, data: UsuarioSistemaLoginResponse }> {
         try {
             const response = await axiosIns.post(`${url}${endpoints.verificacionusuariosistema}`, data);
+            const dataResponse = response.data.data;
+            const access = dataResponse.access;
+            const refresh = dataResponse.refresh;
+            const userData = dataResponse.userData;
 
-            const { access, refresh, id, usuario } = response.data.data;
-
-            localStorage.setItem('usuarioSistemaId', id.toString());
-            localStorage.setItem('access_token', access);
-            localStorage.setItem('refresh_token', refresh);
+            if (access && refresh && userData.email) {
+                this.cookie.set('access_token', access, 1, '/');
+                this.cookie.set('refresh_token', refresh, 1, '/');
+                this.cookie.set('userData', encodeURIComponent(JSON.stringify(userData)), 1, '/');
+                this.setUsuario(userData.email);
+            } else {
+                console.error("Datos incompletos en la respuesta:", dataResponse);
+                throw new Error("La respuesta del servidor no contiene los datos necesarios.");
+            }
 
             return response.data;
         } catch (error) {
@@ -43,16 +65,15 @@ export class UsuarioSistemaService {
         }
     }
 
-    private usuarioSubject = new BehaviorSubject<string | null>(localStorage.getItem('usuario'));
-    usuario$ = this.usuarioSubject.asObservable();
-
-    setUsuario(usuario: string) {
-        localStorage.setItem('usuario', usuario);
-        this.usuarioSubject.next(usuario);
+    setUsuario(email: string) {
+        this.usuarioSubject.next(email);
     }
 
     clearUsuario() {
-        localStorage.removeItem('usuario');
+        this.cookie.delete('access_token');
+        this.cookie.delete('refresh_token');
+        this.cookie.delete('usuarioSistemaId');
+        this.cookie.delete('usuario');
         this.usuarioSubject.next(null);
     }
 

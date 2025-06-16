@@ -54,36 +54,59 @@ exports.endpoints = {
     actualizarUsuarioSistema: function (id) { return "autenticacion/usuariosistema/actualizar/" + id + "/"; },
     eliminarUsuarioSistema: function (id) { return "autenticacion/usuariosistema/eliminar/" + id + "/"; }
 };
-// ✅ Interceptor para agregar el token a cada petición
-axios_1.axiosIns.interceptors.request.use(function (config) {
-    var token = localStorage.getItem('access_token');
-    if (token) {
-        config.headers.Authorization = "Bearer " + token;
-    }
-    return config;
-});
 var UsuarioSistemaService = /** @class */ (function () {
-    function UsuarioSistemaService() {
-        this.usuarioSubject = new rxjs_1.BehaviorSubject(localStorage.getItem('usuario'));
-        this.usuario$ = this.usuarioSubject.asObservable();
+    function UsuarioSistemaService(cookie) {
+        var _a;
+        this.cookie = cookie;
+        this.usuarioSubject = new rxjs_1.BehaviorSubject(null);
+        this.usuario$ = (_a = this.usuarioSubject) === null || _a === void 0 ? void 0 : _a.asObservable();
+        var rawUsuarioSistema = this.cookie.get('userData');
+        if (rawUsuarioSistema) {
+            try {
+                var user = JSON.parse(decodeURIComponent(rawUsuarioSistema));
+                if (user === null || user === void 0 ? void 0 : user.email) {
+                    this.setUsuario(user.email);
+                }
+                else {
+                    this.clearUsuario();
+                }
+            }
+            catch (e) {
+                console.error('Error al parsear usuarioSistema', e);
+                this.clearUsuario();
+            }
+        }
+        else {
+            this.clearUsuario();
+        }
     }
     UsuarioSistemaService.prototype.verificarUsuarioSistema = function (data) {
         return __awaiter(this, void 0, Promise, function () {
-            var response, _a, access, refresh, id, usuario, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var response, dataResponse, access, refresh, userData, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _b.trys.push([0, 2, , 3]);
+                        _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.verificacionusuariosistema, data)];
                     case 1:
-                        response = _b.sent();
-                        _a = response.data.data, access = _a.access, refresh = _a.refresh, id = _a.id, usuario = _a.usuario;
-                        localStorage.setItem('usuarioSistemaId', id.toString());
-                        localStorage.setItem('access_token', access);
-                        localStorage.setItem('refresh_token', refresh);
+                        response = _a.sent();
+                        dataResponse = response.data.data;
+                        access = dataResponse.access;
+                        refresh = dataResponse.refresh;
+                        userData = dataResponse.userData;
+                        if (access && refresh && userData.email) {
+                            this.cookie.set('access_token', access, 1, '/');
+                            this.cookie.set('refresh_token', refresh, 1, '/');
+                            this.cookie.set('userData', encodeURIComponent(JSON.stringify(userData)), 1, '/');
+                            this.setUsuario(userData.email);
+                        }
+                        else {
+                            console.error("Datos incompletos en la respuesta:", dataResponse);
+                            throw new Error("La respuesta del servidor no contiene los datos necesarios.");
+                        }
                         return [2 /*return*/, response.data];
                     case 2:
-                        error_1 = _b.sent();
+                        error_1 = _a.sent();
                         console.error('Error al verificar el Usuario del Sistema:', error_1);
                         throw error_1;
                     case 3: return [2 /*return*/];
@@ -91,12 +114,14 @@ var UsuarioSistemaService = /** @class */ (function () {
             });
         });
     };
-    UsuarioSistemaService.prototype.setUsuario = function (usuario) {
-        localStorage.setItem('usuario', usuario);
-        this.usuarioSubject.next(usuario);
+    UsuarioSistemaService.prototype.setUsuario = function (email) {
+        this.usuarioSubject.next(email);
     };
     UsuarioSistemaService.prototype.clearUsuario = function () {
-        localStorage.removeItem('usuario');
+        this.cookie["delete"]('access_token');
+        this.cookie["delete"]('refresh_token');
+        this.cookie["delete"]('usuarioSistemaId');
+        this.cookie["delete"]('usuario');
         this.usuarioSubject.next(null);
     };
     UsuarioSistemaService.prototype.getUsuarioSistema = function () {

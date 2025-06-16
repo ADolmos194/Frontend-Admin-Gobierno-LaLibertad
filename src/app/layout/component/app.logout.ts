@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Subscription } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
     standalone: true,
@@ -11,10 +12,10 @@ import { Subscription } from 'rxjs';
     template: `
     <div class="pt-2 flex gap-2 flex-wrap justify-start">
         <div>
-            <p class="text-lg font-semibold">Usuario: {{ usuario }}</p>
+            <p class="text-lg font-semibold">{{ email }}</p>
         </div>
         <div>
-            <p-button severity="warn" label="Cerrar Sesión" (onClick)="logout()"></p-button>
+            <p-button severity="info" label="Cerrar Sesión" (onClick)="logout()"></p-button>
         </div>
     </div>`,
     host: {
@@ -22,27 +23,66 @@ import { Subscription } from 'rxjs';
     }
 })
 export class AppLogout implements OnInit {
-    usuario: string = 'Desconocido';
+    email: string = 'Desconocido';
     private sub!: Subscription;
 
-    constructor(private router: Router, private usuariosistemaService: UsuarioSistemaService) { }
+    constructor(
+        private router: Router,
+        private usuariosistemaService: UsuarioSistemaService,
+        private cookie: CookieService
+    ) { }
+
+    getTokenExpiration(token: string): number | null {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp ? payload.exp * 1000 : null;
+        } catch (e) {
+            console.error('Token inválido', e);
+            return null;
+        }
+    }
 
     ngOnInit() {
-        this.sub = this.usuariosistemaService.usuario$.subscribe(usuario => {
-            this.usuario = usuario ?? localStorage.getItem('usuario') ?? 'Desconocido';
-        });
+        const cookieData = this.cookie.get('userData');
+        const accessToken = this.cookie.get('access_token');
+
+        if (cookieData) {
+            try {
+                const user = JSON.parse(decodeURIComponent(cookieData));
+                this.email = user.email || 'Desconocido';
+            } catch (e) {
+                console.error('Error al parsear userData', e);
+            }
+        }
+
+        if (accessToken) {
+            const exp = this.getTokenExpiration(accessToken);
+            if (exp) {
+                const now = Date.now();
+                const timeout = exp - now;
+                if (timeout > 0) {
+                    setTimeout(() => {
+                        this.logout();
+                    }, timeout);
+                } else {
+                    this.logout(); // token ya expirado
+                }
+            } else {
+                this.logout(); // no se pudo leer expiración
+            }
+        } else {
+            this.logout(); // sin token
+        }
     }
 
     logout() {
+        this.cookie.delete('access_token', '/');
+        this.cookie.delete('refresh_token', '/');
+        this.cookie.delete('userData', '/');
+
         this.usuariosistemaService.clearUsuario();
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('usuarioSistemaId');
-        localStorage.removeItem('usuario');
         this.router.navigate(['/auth/login']);
     }
-
-
 
 
     ngOnDestroy() {
