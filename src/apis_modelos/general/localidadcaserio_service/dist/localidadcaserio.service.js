@@ -42,126 +42,125 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.DemandasService = exports.endpoints = exports.url = void 0;
+exports.LocalidadCaserioService = exports.endpoints = exports.url = void 0;
 var core_1 = require("@angular/core");
 var axios_1 = require("@/plugins/axios");
 exports.url = axios_1.api_url;
 exports.endpoints = {
-    tiposdemandas: "appdemandas/tiposdemandas/",
-    // Define the endpoints for the demandas API
-    demandas: function (id) { return "appdemandas/demandas/" + id + "/"; },
-    crearDemandas: "appdemandas/demandas/crear/",
-    actualizarDemandas: function (id) { return "appdemandas/demandas/actualizar/" + id + "/"; },
-    eliminarDemandas: function (id) { return "appdemandas/demandas/eliminar/" + id + "/"; }
+    localidadescaseriosactivos: "app/localidadcaserioactivos/",
+    localidadescaserios: "app/localidadcaserio/",
+    crearLocalidadCaserio: "app/localidadcaserio/crear/",
+    actualizarLocalidadCaserio: function (id) { return "app/localidadcaserio/actualizar/" + id + "/"; },
+    eliminarLocalidadCaserio: function (id) { return "app/localidadcaserio/eliminar/" + id + "/"; }
 };
-var DemandasService = /** @class */ (function () {
-    function DemandasService() {
+var LocalidadCaserioService = /** @class */ (function () {
+    function LocalidadCaserioService() {
     }
-    DemandasService.prototype.getTiposDemandas = function () {
+    LocalidadCaserioService.prototype.getLocalidadesCaseriosActivos = function () {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.tiposdemandas)];
+                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.localidadescaseriosactivos)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data.data];
                     case 2:
                         error_1 = _a.sent();
-                        console.error('Error al obtener los tipos de demandas', error_1);
+                        console.error('Error al obtener las Localidades - Caserios activos:', error_1);
                         throw error_1;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandasService.prototype.getDemandas = function (id) {
+    LocalidadCaserioService.prototype.getLocalidadesCaserios = function () {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.demandas(id))];
+                        return [4 /*yield*/, axios_1.axiosIns.get("" + exports.url + exports.endpoints.localidadescaserios)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data.data];
                     case 2:
                         error_2 = _a.sent();
-                        console.error('Error al obtener las demandas', error_2);
+                        console.error('Error al obtener las Localidades - Caserios:', error_2);
                         throw error_2;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandasService.prototype.createDemandas = function (data) {
+    LocalidadCaserioService.prototype.createLocalidadCaserio = function (data) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.crearDemandas, data)];
+                        return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.crearLocalidadCaserio, data)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_3 = _a.sent();
-                        console.error('Error al crear la demanda', error_3);
+                        console.error('Error al crear la Localidad - el Caserio:', error_3);
                         throw error_3;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandasService.prototype.updateDemandas = function (id, data) {
+    LocalidadCaserioService.prototype.updateLocalidadCaserio = function (id, data) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns.put("" + exports.url + exports.endpoints.actualizarDemandas(id), data)];
+                        return [4 /*yield*/, axios_1.axiosIns.put("" + exports.url + exports.endpoints.actualizarLocalidadCaserio(id), data)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_4 = _a.sent();
-                        console.error('Error al actualizar la demanda', error_4);
+                        console.error('Error al actualizar la Localidad - el Caserio', error_4);
                         throw error_4;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandasService.prototype.deleteDemandas = function (id) {
+    LocalidadCaserioService.prototype.deleteLocalidadCaserio = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var response, error_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, axios_1.axiosIns["delete"]("" + exports.url + exports.endpoints.eliminarDemandas(id))];
+                        return [4 /*yield*/, axios_1.axiosIns["delete"]("" + exports.url + exports.endpoints.eliminarLocalidadCaserio(id))];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
                     case 2:
                         error_5 = _a.sent();
-                        console.error('Error al eliminar la demanda', error_5);
+                        console.error('Error al eliminar la Localidad - el Caserio:', error_5);
                         throw error_5;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    DemandasService = __decorate([
+    LocalidadCaserioService = __decorate([
         core_1.Injectable({
             providedIn: 'root'
         })
-    ], DemandasService);
-    return DemandasService;
+    ], LocalidadCaserioService);
+    return LocalidadCaserioService;
 }());
-exports.DemandasService = DemandasService;
+exports.LocalidadCaserioService = LocalidadCaserioService;

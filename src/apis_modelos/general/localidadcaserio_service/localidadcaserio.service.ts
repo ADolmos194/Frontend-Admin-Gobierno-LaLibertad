@@ -3,6 +3,7 @@ import { axiosIns, api_url } from '@/plugins/axios';
 
 export const url = api_url;
 export const endpoints = {
+    localidadescaseriosactivos: "app/localidadcaserioactivos/",
     localidadescaserios: "app/localidadcaserio/",
     crearLocalidadCaserio: "app/localidadcaserio/crear/",
     actualizarLocalidadCaserio: (id: number) => `app/localidadcaserio/actualizar/${id}/`,
@@ -13,6 +14,17 @@ export const endpoints = {
     providedIn: 'root',
 })
 export class LocalidadCaserioService {
+
+    async getLocalidadesCaseriosActivos() {
+        try {
+            const response = await axiosIns.get(`${url}${endpoints.localidadescaseriosactivos}`);
+            return response.data.data;
+        } catch (error) {
+            console.error('Error al obtener las Localidades - Caserios activos:', error);
+            throw error;
+        }
+    }
+
     async getLocalidadesCaserios() {
         try {
             const response = await axiosIns.get(`${url}${endpoints.localidadescaserios}`);

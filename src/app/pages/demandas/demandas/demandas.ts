@@ -32,7 +32,7 @@ import { DistritosActivos } from '@/apis_modelos/general/distrito_servcie/distri
 import { DistritoService } from '@/apis_modelos/general/distrito_servcie/distrito.service';
 import { ProvinciasActivas } from '@/apis_modelos/general/provincia_service/provinciasactivas.model';
 import { ProvinciaService } from '@/apis_modelos/general/provincia_service/provincia.service';
-import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
+import { DatePicker } from 'primeng/datepicker';
 import { ImageUploadService } from '@/apis_modelos/imagenes/imagenes.service';
 import { TiposProductosActivos } from '@/apis_modelos/categorias/tipoproducto_service/tipoproductoactivo.model';
 import { TooltipModule } from 'primeng/tooltip';
@@ -41,6 +41,7 @@ import { CardModule } from 'primeng/card';
 import { CookieService } from 'ngx-cookie-service';
 import { LocalidadCaserioActivos } from '@/apis_modelos/general/localidadcaserio_service/localidadcaserioactivos.model';
 import { TipoDemandasActivas } from '@/apis_modelos/demandas/tipodemandasactivos.model';
+import { LocalidadCaserioService } from '@/apis_modelos/general/localidadcaserio_service/localidadcaserio.service';
 
 
 interface Column {
@@ -74,6 +75,7 @@ interface ExportColumn {
         SelectModule,
         RadioButtonModule,
         InputNumberModule,
+        DatePicker,
         DialogModule,
         TagModule,
         InputIconModule,
@@ -183,7 +185,9 @@ export class DemandasGeneral implements OnInit {
         private distritoService: DistritoService,
         private productoService: ProductoService,
         private tipoproductoService: TipoProductoService,
+        private localidadcaserioService: LocalidadCaserioService,
         private imageUploadService: ImageUploadService,
+        private confirmationService: ConfirmationService,
         private cookieService: CookieService
     ) { }
 
@@ -258,12 +262,12 @@ export class DemandasGeneral implements OnInit {
     async ngOnInit() {
         this.isLoading = true;
         try {
+            await Promise.all([this.cargarOpciones(this.demandasService.getTiposDemandas.bind(this.demandasService), this.opcionesTipoDemandasActivas, 'tipos demandas activos')]);
             await Promise.all([this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciasActivas, 'provincias activas')]);
             await Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')]);
             await Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')]);
             await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')]);
-            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'localidad - caserio')]);
-            await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'tipos demandas activos')]);
+            await Promise.all([this.cargarOpciones(this.localidadcaserioService.getLocalidadesCaseriosActivos.bind(this.localidadcaserioService), this.opcionesLocalidadCaserioActivo, 'localidad - caserio')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             const usuarioId = this.getUsuarioSistemaId();
             await this.cargarDemandas();
@@ -408,26 +412,43 @@ export class DemandasGeneral implements OnInit {
     }
 
     editarDemandas(demanda: Demandas) {
-        this.demanda = { ...demanda };
+        this.demanda = {
+            ...demanda,
+            fecha_publicacion: demanda.fecha_publicacion ? new Date(demanda.fecha_publicacion) : this.fechaHoy
+        };
         this.accion = 2;
         this.demandasDialogo = true;
         this.previewUrl = this.demanda.url_imagen || null;
         this.selectedFile = null;
     }
 
+
     async eliminarDemandas(demanda: Demandas) {
-        const id = demanda.id;
-        this.isLoading = true;
-        try {
-            const response = await this.demandasService.deleteDemandas(id);
-            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-            await this.cargarDemandas();
-        } catch (error: any) {
-            const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-        } finally {
-            this.isLoading = false;
-        }
+        this.confirmationService.confirm({
+            message: `¿Estás seguro de que deseas eliminar la demanda "${demanda.descripcion}"?`,
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí',
+            rejectLabel: 'No',
+            acceptButtonStyleClass: 'p-button-danger',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                this.isLoading = true;
+                try {
+                    const response = await this.productoService.deleteProducto(demanda.id);
+                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                    await this.cargarDemandas();
+                } catch (error: any) {
+                    const msg = error?.response?.data?.message_user || 'Error inesperado';
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            reject: () => {
+                this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la demanda' });
+            }
+        });
     }
 
 }

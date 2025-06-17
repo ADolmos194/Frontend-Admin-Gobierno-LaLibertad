@@ -78,12 +78,13 @@ var demandas_service_1 = require("@/apis_modelos/demandas/demandas.service");
 var checkbox_1 = require("primeng/checkbox");
 var drawer_1 = require("primeng/drawer");
 var skeleton_1 = require("primeng/skeleton");
+var datepicker_1 = require("primeng/datepicker");
 var imagenes_service_1 = require("@/apis_modelos/imagenes/imagenes.service");
 var tooltip_1 = require("primeng/tooltip");
 var fileupload_1 = require("primeng/fileupload");
 var card_1 = require("primeng/card");
 var DemandasGeneral = /** @class */ (function () {
-    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService, cookieService) {
+    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, localidadcaserioService, imageUploadService, confirmationService, cookieService) {
         this.demandasService = demandasService;
         this.messageService = messageService;
         this.estadoService = estadoService;
@@ -91,7 +92,9 @@ var DemandasGeneral = /** @class */ (function () {
         this.distritoService = distritoService;
         this.productoService = productoService;
         this.tipoproductoService = tipoproductoService;
+        this.localidadcaserioService = localidadcaserioService;
         this.imageUploadService = imageUploadService;
+        this.confirmationService = confirmationService;
         this.cookieService = cookieService;
         this.demandasDialogo = false;
         this.MostrarDemandaEcommerceDialogo = false;
@@ -270,22 +273,22 @@ var DemandasGeneral = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 10, 11, 12]);
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciasActivas, 'provincias activas')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.demandasService.getTiposDemandas.bind(this.demandasService), this.opcionesTipoDemandasActivas, 'tipos demandas activos')])];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciasActivas, 'provincias activas')])];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')])];
                     case 4:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')])];
                     case 5:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'localidad - caserio')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')])];
                     case 6:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'tipos demandas activos')])];
+                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.localidadcaserioService.getLocalidadesCaseriosActivos.bind(this.localidadcaserioService), this.opcionesLocalidadCaserioActivo, 'localidad - caserio')])];
                     case 7:
                         _a.sent();
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
@@ -452,42 +455,59 @@ var DemandasGeneral = /** @class */ (function () {
         }
     };
     DemandasGeneral.prototype.editarDemandas = function (demanda) {
-        this.demanda = __assign({}, demanda);
+        this.demanda = __assign(__assign({}, demanda), { fecha_publicacion: demanda.fecha_publicacion ? new Date(demanda.fecha_publicacion) : this.fechaHoy });
         this.accion = 2;
         this.demandasDialogo = true;
         this.previewUrl = this.demanda.url_imagen || null;
         this.selectedFile = null;
     };
     DemandasGeneral.prototype.eliminarDemandas = function (demanda) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var id, response, error_5, msg;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        id = demanda.id;
-                        this.isLoading = true;
-                        _c.label = 1;
-                    case 1:
-                        _c.trys.push([1, 4, 5, 6]);
-                        return [4 /*yield*/, this.demandasService.deleteDemandas(id)];
-                    case 2:
-                        response = _c.sent();
-                        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
-                        return [4 /*yield*/, this.cargarDemandas()];
-                    case 3:
-                        _c.sent();
-                        return [3 /*break*/, 6];
-                    case 4:
-                        error_5 = _c.sent();
-                        msg = ((_b = (_a = error_5 === null || error_5 === void 0 ? void 0 : error_5.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-                        return [3 /*break*/, 6];
-                    case 5:
-                        this.isLoading = false;
-                        return [7 /*endfinally*/];
-                    case 6: return [2 /*return*/];
-                }
+            var _this = this;
+            return __generator(this, function (_a) {
+                this.confirmationService.confirm({
+                    message: "\u00BFEst\u00E1s seguro de que deseas eliminar la demanda \"" + demanda.descripcion + "\"?",
+                    header: 'Confirmar eliminación',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptLabel: 'Sí',
+                    rejectLabel: 'No',
+                    acceptButtonStyleClass: 'p-button-danger',
+                    rejectButtonStyleClass: 'p-button-secondary',
+                    accept: function () { return __awaiter(_this, void 0, void 0, function () {
+                        var response, error_5, msg;
+                        var _a, _b;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0:
+                                    this.isLoading = true;
+                                    _c.label = 1;
+                                case 1:
+                                    _c.trys.push([1, 4, 5, 6]);
+                                    return [4 /*yield*/, this.productoService.deleteProducto(demanda.id)];
+                                case 2:
+                                    response = _c.sent();
+                                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                                    return [4 /*yield*/, this.cargarDemandas()];
+                                case 3:
+                                    _c.sent();
+                                    return [3 /*break*/, 6];
+                                case 4:
+                                    error_5 = _c.sent();
+                                    msg = ((_b = (_a = error_5 === null || error_5 === void 0 ? void 0 : error_5.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
+                                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                                    return [3 /*break*/, 6];
+                                case 5:
+                                    this.isLoading = false;
+                                    return [7 /*endfinally*/];
+                                case 6: return [2 /*return*/];
+                            }
+                        });
+                    }); },
+                    reject: function () {
+                        _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la demanda' });
+                    }
+                });
+                return [2 /*return*/];
             });
         });
     };
@@ -511,6 +531,7 @@ var DemandasGeneral = /** @class */ (function () {
                 select_1.SelectModule,
                 radiobutton_1.RadioButtonModule,
                 inputnumber_1.InputNumberModule,
+                datepicker_1.DatePicker,
                 dialog_1.DialogModule,
                 tag_1.TagModule,
                 inputicon_1.InputIconModule,
