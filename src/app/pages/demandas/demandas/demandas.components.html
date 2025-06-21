@@ -5,7 +5,7 @@
         <ng-template #start>
             <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="abrirNuevo()" pTooltip="Crear demanda"
                 tooltipPosition="top" />
-            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined />
+            <p-button severity="danger" label="Eliminar seleccionados" icon="pi pi-trash" outlined  (onClick)="eliminarDemandasSeleccionadas()" />
         </ng-template>
         <ng-template #end>
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" />
@@ -16,7 +16,7 @@
 <div class="card">
     <p-table #dt [value]="demandas()" [rows]="10" [columns]="cols" [paginator]="true"
         [globalFilterFields]="['nombre', 'fecha_creacion', 'fecha_modificacion']"
-        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDemandas" [rowHover]="true" dataKey="id"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="seleccionarDemandas" selectionMode="multiple" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} demandas" [showCurrentPageReport]="true"
         *ngIf="!isLoading; else cargandoDatos">
 
@@ -33,7 +33,7 @@
         <ng-template #header let-columns>
             <tr>
                 <th>
-                    <p-tableheadercheckbox />
+                    <p-tableHeaderCheckbox />
                 </th>
                 <th>Opciones</th>
                 <th *ngFor="let col of columns" [pSortableColumn]="col.field">
@@ -46,7 +46,7 @@
         <ng-template pTemplate="body" let-rowData let-columns="columns">
             <tr>
                 <td>
-                    <p-tablecheckbox [value]="rowData" />
+                    <p-tableCheckbox [value]="rowData" />
                 </td>
                 <td>
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
@@ -168,12 +168,16 @@
 
             <div>
                 <label for="fecha_publicacion" class="block font-bold mb-3">Fecha de publicación</label>
-                <p-datepicker class="max-w-full" [(ngModel)]="demanda.fecha_publicacion" [inline]="true" [showWeek]="true" />
+                <div class="flex justify-center">
+                    <p-datepicker class="max-w-full" [(ngModel)]="demanda.fecha_publicacion" [inline]="true"
+                        [showWeek]="true">
+                    </p-datepicker>
+                </div>
             </div>
 
             <div>
                 <label for="tipoproducto_id" class="block font-bold mb-3">Tipo de
-                    producto</label>    
+                    producto</label>
                 <p-select [(ngModel)]="demanda.tipoproducto_id" inputId="tipoproducto_id"
                     [options]="opcionesTipoProductosActivos" optionLabel="nombre" optionValue="id"
                     placeholder="Seleccionar tipo de producto" appendTo="body" fluid />
@@ -206,7 +210,12 @@
                     [options]="opcionesLocalidadCaserioActivo" optionLabel="nombre" optionValue="id"
                     placeholder="Seleccionar localidad - caserio" appendTo="body" fluid />
             </div>
-
+            <div>
+                <label for="direccion" class="block font-bold mb-3">Dirección</label>
+                <input type="text" pInputText [(ngModel)]="demanda.direccion" id="direccion" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.direccion">Dirección es
+                    requerido</small>
+            </div>
             <div>
                 <label for="referencia_ubicacion" class="block font-bold mb-3">Referencia ubicación</label>
                 <input type="text" pInputText [(ngModel)]="demanda.referencia_ubicacion" id="referencia_ubicacion"

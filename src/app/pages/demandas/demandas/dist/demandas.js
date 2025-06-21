@@ -128,6 +128,7 @@ var DemandasGeneral = /** @class */ (function () {
         };
         this.enviar = false;
         this.isLoading = false;
+        this.cols = [];
         this.accion = 1;
         this.opcionesEstado = [];
         this.opcionesProvinciasActivas = [];
@@ -194,6 +195,7 @@ var DemandasGeneral = /** @class */ (function () {
                     case 0:
                         this.isLoading = true;
                         this.cols = [
+                            { field: '', header: '' },
                             { field: 'nombre_tipodemanda', header: 'Tipo de demanda' },
                             { field: 'url_imagen', header: 'Imagen' },
                             { field: 'fecha_publicacion', header: 'Fecha de publicación' },
@@ -323,6 +325,7 @@ var DemandasGeneral = /** @class */ (function () {
         this.demandasDialogo = true;
         this.selectedFile = null;
         this.previewUrl = null;
+        this.demanda.tiposdemandas_id = 1;
     };
     DemandasGeneral.prototype.abrirDemandaEcommerceDialogo = function (demandaSeleccionada) {
         this.accionMostrarDemandaEcommerceDialogo = 1;
@@ -505,6 +508,62 @@ var DemandasGeneral = /** @class */ (function () {
                     }); },
                     reject: function () {
                         _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la demanda' });
+                    }
+                });
+                return [2 /*return*/];
+            });
+        });
+    };
+    DemandasGeneral.prototype.eliminarDemandasSeleccionadas = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (!this.seleccionarDemandas || this.seleccionarDemandas.length === 0) {
+                    this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'No hay demandas seleccionadas' });
+                    return [2 /*return*/];
+                }
+                this.confirmationService.confirm({
+                    message: "\u00BFEst\u00E1s seguro de que deseas eliminar " + this.seleccionarDemandas.length + " demandas seleccionadas?",
+                    header: 'Confirmar eliminación múltiple',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptLabel: 'Sí',
+                    rejectLabel: 'No',
+                    acceptButtonStyleClass: 'p-button-danger',
+                    rejectButtonStyleClass: 'p-button-secondary',
+                    accept: function () { return __awaiter(_this, void 0, void 0, function () {
+                        var ids, response, error_6, msg;
+                        var _a;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    this.isLoading = true;
+                                    _b.label = 1;
+                                case 1:
+                                    _b.trys.push([1, 4, 5, 6]);
+                                    ids = this.seleccionarDemandas.map(function (d) { return d.id; });
+                                    return [4 /*yield*/, this.demandasService.eliminarMultiplesDemandas(ids)];
+                                case 2:
+                                    response = _b.sent();
+                                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                                    this.seleccionarDemandas = [];
+                                    return [4 /*yield*/, this.cargarDemandas()];
+                                case 3:
+                                    _b.sent();
+                                    return [3 /*break*/, 6];
+                                case 4:
+                                    error_6 = _b.sent();
+                                    msg = ((_a = error_6 === null || error_6 === void 0 ? void 0 : error_6.error) === null || _a === void 0 ? void 0 : _a.message_user) || 'Error inesperado';
+                                    this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                                    return [3 /*break*/, 6];
+                                case 5:
+                                    this.isLoading = false;
+                                    return [7 /*endfinally*/];
+                                case 6: return [2 /*return*/];
+                            }
+                        });
+                    }); },
+                    reject: function () {
+                        _this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminaron las demandas' });
                     }
                 });
                 return [2 /*return*/];

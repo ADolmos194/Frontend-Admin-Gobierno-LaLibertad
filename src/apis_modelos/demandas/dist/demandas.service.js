@@ -52,7 +52,8 @@ exports.endpoints = {
     demandas: function (id) { return "appdemandas/demandas/" + id + "/"; },
     crearDemandas: "appdemandas/demandas/crear/",
     actualizarDemandas: function (id) { return "appdemandas/demandas/actualizar/" + id + "/"; },
-    eliminarDemandas: function (id) { return "appdemandas/demandas/eliminar/" + id + "/"; }
+    eliminarDemandas: function (id) { return "appdemandas/demandas/eliminar/" + id + "/"; },
+    eliminarDemandasMasiva: "appdemandas/demandas/eliminacion-masiva/"
 };
 var DemandasService = /** @class */ (function () {
     function DemandasService() {
@@ -152,6 +153,26 @@ var DemandasService = /** @class */ (function () {
                         error_5 = _a.sent();
                         console.error('Error al eliminar la demanda', error_5);
                         throw error_5;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DemandasService.prototype.eliminarMultiplesDemandas = function (ids) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, error_6;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, axios_1.axiosIns.post("" + exports.url + exports.endpoints.eliminarDemandasMasiva, { ids: ids })];
+                    case 1:
+                        response = _a.sent();
+                        return [2 /*return*/, response.data];
+                    case 2:
+                        error_6 = _a.sent();
+                        console.error('Error al eliminar múltiples demandas', error_6);
+                        throw error_6;
                     case 3: return [2 /*return*/];
                 }
             });

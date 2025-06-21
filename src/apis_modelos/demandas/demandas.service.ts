@@ -10,6 +10,7 @@ export const endpoints = {
     crearDemandas: "appdemandas/demandas/crear/",
     actualizarDemandas: (id: number) => `appdemandas/demandas/actualizar/${id}/`,
     eliminarDemandas: (id: number) => `appdemandas/demandas/eliminar/${id}/`,
+    eliminarDemandasMasiva: "appdemandas/demandas/eliminacion-masiva/",
 };
 
 @Injectable({
@@ -64,4 +65,15 @@ export class DemandasService {
             throw error;
         }
     }
+    async eliminarMultiplesDemandas(ids: number[]) {
+        try {
+            const response = await axiosIns.post(`${url}${endpoints.eliminarDemandasMasiva}`, { ids });
+            return response.data;
+        } catch (error) {
+            console.error('Error al eliminar múltiples demandas', error);
+            throw error;
+        }
+    }
 }
+
+

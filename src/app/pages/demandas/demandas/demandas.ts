@@ -126,7 +126,7 @@ export class DemandasGeneral implements OnInit {
     seleccionarDemandas!: Demandas[] | null;
     enviar: boolean = false;
     isLoading: boolean = false;
-    cols!: Column[];
+    cols: { field: string; header: string }[] = [];
     accion: number = 1;
     opcionesEstado: Estado[] = [];
     opcionesProvinciasActivas: ProvinciasActivas[] = [];
@@ -208,6 +208,7 @@ export class DemandasGeneral implements OnInit {
     async cargarDemandas() {
         this.isLoading = true;
         this.cols = [
+            { field: '', header: '' },
             { field: 'nombre_tipodemanda', header: 'Tipo de demanda' },
             { field: 'url_imagen', header: 'Imagen' },
             { field: 'fecha_publicacion', header: 'Fecha de publicación' },
@@ -290,6 +291,7 @@ export class DemandasGeneral implements OnInit {
         this.demandasDialogo = true;
         this.selectedFile = null;
         this.previewUrl = null;
+        this.demanda.tiposdemandas_id = 1;
     }
 
     abrirDemandaEcommerceDialogo(demandaSeleccionada: Demandas) {
@@ -450,6 +452,42 @@ export class DemandasGeneral implements OnInit {
             }
         });
     }
+
+    async eliminarDemandasSeleccionadas() {
+    if (!this.seleccionarDemandas || this.seleccionarDemandas.length === 0) {
+        this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'No hay demandas seleccionadas' });
+        return;
+    }
+
+    this.confirmationService.confirm({
+        message: `¿Estás seguro de que deseas eliminar ${this.seleccionarDemandas.length} demandas seleccionadas?`,
+        header: 'Confirmar eliminación múltiple',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
+        acceptButtonStyleClass: 'p-button-danger',
+        rejectButtonStyleClass: 'p-button-secondary',
+        accept: async () => {
+            this.isLoading = true;
+            try {
+                const ids = this.seleccionarDemandas!.map(d => d.id);
+                const response = await this.demandasService.eliminarMultiplesDemandas(ids);
+                this.messageService.add({ severity: 'success', summary: 'Éxito', detail: response.message_user });
+                this.seleccionarDemandas = [];
+                await this.cargarDemandas();
+            } catch (error: any) {
+                const msg = error?.error?.message_user || 'Error inesperado';
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        reject: () => {
+            this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminaron las demandas' });
+        }
+    });
+}
+
 
 }
 
