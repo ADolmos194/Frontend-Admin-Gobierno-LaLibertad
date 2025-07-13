@@ -55,56 +55,160 @@ var inputgroupaddon_1 = require("primeng/inputgroupaddon");
 var password_1 = require("primeng/password");
 var divider_1 = require("primeng/divider");
 var ripple_1 = require("primeng/ripple");
-var autenticacion_service_1 = require("@/apis_modelos/autenticacion/autenticacion.service");
+var select_1 = require("primeng/select");
+var autenticacion_service_1 = require("@/apis_modelos/autenticacion/autenticacion_service/autenticacion.service");
 var api_1 = require("primeng/api");
 var toast_1 = require("primeng/toast");
 var router_2 = require("@angular/router");
-var app_floatingconfigurator_1 = require("../../../layout/component/app.floatingconfigurator");
+var progressspinner_1 = require("primeng/progressspinner");
 var Register = /** @class */ (function () {
-    function Register(usuariosistemaService, messageService, router) {
+    function Register(usuariosistemaService, provinciaService, distritoService, messageService, router) {
         this.usuariosistemaService = usuariosistemaService;
+        this.provinciaService = provinciaService;
+        this.distritoService = distritoService;
         this.messageService = messageService;
         this.router = router;
         this.isLoading = false;
+        this.isLoadingButton = false;
         this.enviar = false;
         this.usuariosistemaregister = {
             id: 0,
-            nombre: '',
-            apellido: '',
+            nombrecompleto: '',
             usuario: '',
             password: '',
             email: '',
-            estado_id: 1,
-            fecha_creacion: '',
-            fecha_modificacion: ''
+            tipodocumento: 'DNI',
+            numerodocumento: '',
+            numero_celular: '',
+            numero_telefono: '',
+            distrito_id: 0,
+            direccion: '',
+            terminos_condiciones: false,
+            estado_id: 1
         };
+        this.opcionesProvinciaActivas = [];
+        this.opcionesDistritoActivos = [];
+        this.tipodocuemtoselccionado = [
+            { id: 'DNI', nombre: 'DNI' },
+            { id: 'Carnet de Extranjería', nombre: 'Carnet de Extranjería' },
+            { id: 'Pasaporte', nombre: 'Pasaporte' },
+            { id: 'RUC', nombre: 'RUC' }
+        ];
     }
     Register.prototype.irAlLogin = function () {
         var _this = this;
-        setTimeout(function () {
-            _this.router.navigate(['/auth/login']);
-        }, 2000);
+        setTimeout(function () { _this.isLoading = false; window.location.href = '/auth/login'; }, 2000);
+    };
+    Register.prototype.cargarOpciones = function (service, opcionesRef, label) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, service()];
+                    case 1:
+                        response = _a.sent();
+                        opcionesRef.length = 0;
+                        response.forEach(function (item) {
+                            opcionesRef.push({
+                                id: item.id,
+                                nombre: item.nombre
+                            });
+                        });
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error("Error al cargar " + label + ":", error_1);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Register.prototype.ngOnInit = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.isLoading = true;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 4, 5, 6]);
+                        return [4 /*yield*/, this.cargarOpciones(this.provinciaService.getProvinciasActivas.bind(this.provinciaService), this.opcionesProvinciaActivas, 'provincia activas')];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritoActivos, 'distrito activos')];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 6];
+                    case 4:
+                        error_2 = _a.sent();
+                        console.error('Error al cargar datos iniciales:', error_2);
+                        return [3 /*break*/, 6];
+                    case 5:
+                        this.isLoading = false;
+                        return [7 /*endfinally*/];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
     };
     Register.prototype.guardarUsuarioSistema = function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var UsuarioSistemaParaEnviar, response, error_1, msg;
+            var campos, camposFaltantes, UsuarioSistemaParaEnviar, response, error_3, msg;
             var _this = this;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
                         this.enviar = true;
-                        this.isLoading = true;
+                        campos = [
+                            { key: 'email', label: 'Email' },
+                            { key: 'usuario', label: 'Usuario' },
+                            { key: 'password', label: 'Contraseña' },
+                            { key: 'nombrecompleto', label: 'Nombre completo' },
+                            { key: 'tipodocumento', label: 'Tipo de documento' },
+                            { key: 'numerodocumento', label: 'Número de documento' },
+                            { key: 'numero_celular', label: 'Número de celular' },
+                            { key: 'distrito_id', label: 'Distrito' }
+                        ];
+                        camposFaltantes = campos.filter(function (campo) { return !_this.usuariosistemaregister[campo.key]; });
+                        if (camposFaltantes.length > 0) {
+                            // Mostrar mensaje específico del primer campo vacío
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'Campo requerido',
+                                detail: "El campo " + camposFaltantes[0].label + " es requerido."
+                            });
+                            // Si hay más de uno, agregar mensaje general
+                            if (camposFaltantes.length > 1) {
+                                this.messageService.add({
+                                    severity: 'info',
+                                    summary: 'Completa el formulario',
+                                    detail: 'Por favor completa todos los campos obligatorios.'
+                                });
+                            }
+                            return [2 /*return*/];
+                        }
+                        this.isLoadingButton = true;
                         _c.label = 1;
                     case 1:
                         _c.trys.push([1, 3, 4, 5]);
                         UsuarioSistemaParaEnviar = {
                             id: this.usuariosistemaregister.id,
-                            nombre: this.usuariosistemaregister.nombre,
-                            apeliido: this.usuariosistemaregister.apellido,
+                            nombrecompleto: this.usuariosistemaregister.nombrecompleto,
                             usuario: this.usuariosistemaregister.usuario,
                             password: this.usuariosistemaregister.password,
                             email: this.usuariosistemaregister.email,
+                            tipodocumento: this.usuariosistemaregister.tipodocumento,
+                            numerodocumento: this.usuariosistemaregister.numerodocumento,
+                            numero_celular: this.usuariosistemaregister.numero_celular,
+                            numero_telefono: this.usuariosistemaregister.numero_telefono,
+                            distrito: this.usuariosistemaregister.distrito_id,
+                            direccion: this.usuariosistemaregister.direccion,
+                            terminos_condiciones: this.usuariosistemaregister.terminos_condiciones,
                             estado: this.usuariosistemaregister.estado_id
                         };
                         return [4 /*yield*/, this.usuariosistemaService.createUsuarioSistema(UsuarioSistemaParaEnviar)];
@@ -119,16 +223,17 @@ var Register = /** @class */ (function () {
                             detail: response.message_user || 'Inicio de sesión exitoso. Redirigiendo...'
                         });
                         setTimeout(function () {
-                            _this.router.navigate(['/auth/login']);
-                        }, 2000);
+                            _this.isLoadingButton = false;
+                            window.location.href = '/auth/login';
+                        }, 1500);
                         return [3 /*break*/, 5];
                     case 3:
-                        error_1 = _c.sent();
-                        msg = ((_b = (_a = error_1 === null || error_1 === void 0 ? void 0 : error_1.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
+                        error_3 = _c.sent();
+                        msg = ((_b = (_a = error_3 === null || error_3 === void 0 ? void 0 : error_3.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
                         this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
                         return [3 /*break*/, 5];
                     case 4:
-                        this.isLoading = false;
+                        this.isLoadingButton = false;
                         return [7 /*endfinally*/];
                     case 5: return [2 /*return*/];
                 }
@@ -139,7 +244,7 @@ var Register = /** @class */ (function () {
         core_1.Component({
             selector: 'app-login',
             standalone: true,
-            imports: [common_1.CommonModule, button_1.ButtonModule, checkbox_1.CheckboxModule, inputtext_1.InputTextModule, password_1.PasswordModule, forms_1.FormsModule, router_1.RouterModule, ripple_1.RippleModule, toast_1.ToastModule, app_floatingconfigurator_1.AppFloatingConfigurator, inputgroup_1.InputGroupModule, inputgroupaddon_1.InputGroupAddonModule, divider_1.DividerModule],
+            imports: [common_1.CommonModule, button_1.ButtonModule, progressspinner_1.ProgressSpinnerModule, checkbox_1.CheckboxModule, inputtext_1.InputTextModule, password_1.PasswordModule, forms_1.FormsModule, router_1.RouterModule, ripple_1.RippleModule, toast_1.ToastModule, inputgroup_1.InputGroupModule, inputgroupaddon_1.InputGroupAddonModule, divider_1.DividerModule, select_1.SelectModule],
             templateUrl: './register.components.html',
             providers: [api_1.MessageService, autenticacion_service_1.UsuarioSistemaService, api_1.ConfirmationService, router_2.Router]
         })

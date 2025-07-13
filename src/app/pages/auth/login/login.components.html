@@ -1,63 +1,126 @@
 <p-toast />
-<app-floating-configurator />
-<div class="min-h-screen grid grid-cols-1 md:grid-cols-2">
 
-    <div class="flex flex-col items-center justify-center  bg-white dark:bg-gray-900">
-        <div class="custom-login-wrapper">
-            <div class="w-full bg-white dark:bg-gray-900 shadow-md py-20 px-8 sm:px-20 custom-login-box">
-                <div class="text-center mb-8">
-                    <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenido a AGROCULTURA
-                        GOBPE!
-                    </div>
-                    <span class="text-muted-color font-medium">Inicia sesión para continuar</span>
-                </div>
+<div *ngIf="isLoading"
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center space-y-3 pointer-events-none">
+    <div class="background-image-logo"></div>
+    <p-progress-spinner strokeWidth="8" fill="transparent"
+        animationDuration=".5s"
+        [style]="{ width: '50px', height: '50px' }">
+    </p-progress-spinner>
+    <span class="text-sm font-medium pointer-events-auto">Cargando...</span>
+</div>
 
-                <div class="mb-4">
+<div *ngIf="!isLoading"
+    class="relative min-h-screen grid grid-cols-1 md:grid-cols-2 background-image-class">
+
+    <!-- Overlay oscuro en TODO el fondo -->
+    <div class="absolute inset-0 bg-black/50 z-10"></div>
+
+    <!-- Panel izquierdo con texto centrado -->
+    <div
+        class="hidden md:flex flex-col justify-center items-center text-center px-8 relative z-20">
+        <h2 class="text-5xl font-extrabold text-white drop-shadow-lg mb-4">
+            Bienvenido de nuevo
+        </h2>
+        <h3 class="text-4xl font-bold text-green-300 mt-2 ">
+            Administra tus productos
+        </h3>
+        <p class="text-xl text-gray-200 mt-6 max-w-md">
+            Ingresa a tu cuenta y continúa gestionando tus cultivos y ofertas
+            agrícolas.
+        </p>
+    </div>
+
+    <!-- Formulario login -->
+    <div class="flex items-center justify-center p-6 md:p-12 relative z-20">
+        <div
+            class="w-full max-w-xl bg-white dark:bg-gray-900/80 backdrop-blur-xl shadow-xl rounded-3xl p-10 sm:p-14 transition-transform duration-500 hover:scale-[1.01]">
+
+            <div class="text-center mb-10">
+                <h3
+                    class="flex justify-center items-center gap-2 text-green-800 dark:text-green-300 text-xl font-semibold tracking-wide mb-2">
+                    <i class="pi pi-leaf"></i>
+                    Gerencia Regional de Agricultura de Trujillo
+                </h3>
+
+                <h2
+                    class="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight relative inline-block after:block after:w-16 after:h-1 after:bg-green-700 after:mt-2 after:mx-auto">
+                    Inicia sesión
+                </h2>
+
+                <p
+                    class="text-lg text-gray-600 dark:text-gray-300 mt-2 max-w-md mx-auto">
+                    Acceda con sus credenciales para continuar gestionando
+                    productos y precios agrícolas.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div>
                     <label for="usuario"
-                        class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Usuario</label>
-                    <input pInputText id="usuario" type="text" placeholder="Ingrese usuario"
-                        class="w-full md:w-[30rem]" [(ngModel)]="usuariosistemalogin.usuario" required fluid />
-                    <small class="text-red-500" *ngIf="enviar && !usuariosistemalogin.usuario">Usuario es
-                        requerido</small>
+                        class="block text-surface-900 dark:text-surface-0 text-lg font-semibold mb-1">
+                        Usuario
+                    </label>
+                    <input pInputText id="usuario" type="text"
+                        placeholder="Ingrese usuario"
+                        class="w-full md:w-[28rem] rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 transition"
+                        [(ngModel)]="usuariosistemalogin.usuario" required
+                        fluid />
+                    <small class="text-red-500"
+                        *ngIf="enviar && !usuariosistemalogin.usuario">
+                        Usuario es requerido
+                    </small>
                 </div>
-
 
                 <div>
                     <label for="password"
-                        class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
-                    <p-password id="password" [(ngModel)]="usuariosistemalogin.password"
-                        placeholder="Ingrese contraseña" [toggleMask]="true" [fluid]="true"
-                        [feedback]="false"></p-password>
-                    <small class="text-red-500" *ngIf="enviar && !usuariosistemalogin.password">Contraseña es
-                        requerido</small>
+                        class="block text-surface-900 dark:text-surface-0 text-lg font-semibold mb-1">
+                        Contraseña
+                    </label>
+                    <p-password id="password"
+                        [(ngModel)]="usuariosistemalogin.password"
+                        placeholder="Ingrese contraseña" [toggleMask]="true"
+                        [fluid]="true" [feedback]="false"
+                        inputClass="rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-green-500 transition" />
+                    <small class="text-red-500"
+                        *ngIf="enviar && !usuariosistemalogin.password">
+                        Contraseña es requerido
+                    </small>
                 </div>
+            </div>
 
+            <div class="flex justify-between items-center mt-4 mb-8">
+                <span
+                    class="text-green-600 font-medium cursor-pointer hover:underline transition">
+                    ¿Has olvidado tu contraseña?
+                </span>
+            </div>
 
-                <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                    <div class="flex items-center">
-                    </div>
-                    <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Has olvidado
-                        tu contraseña?</span>
-                </div>
-                <p-button label="Iniciar sesión" styleClass="w-full" (onClick)="guardarUsuarioSistema()"
-                    [loading]="isLoading">
-                </p-button>
+            <p-button label="Iniciar sesión" styleClass="w-full"
+                (onClick)="guardarUsuarioSistema()"
+                [loading]="isLoadingButton"></p-button>
 
-                <p-divider />
+            <p-divider class="my-6" />
 
-                <div class="flex justify-center mt-4">
-                    <p-button label="Crear cuenta" (onClick)="irACrearCuenta()" severity="warn"
-                        [loading]="isLoadingCrearCuenta">
-                    </p-button>
-                </div>
+            <div class="flex justify-center">
+                <p-button label="Crear cuenta" (onClick)="irACrearCuenta()"
+                    severity="warn" [loading]="isLoadingCrearCuenta"></p-button>
             </div>
         </div>
     </div>
-
-    <div class="hidden md:block bg-cover bg-center bg-no-repeat background-image-class"></div>
 </div>
 
 <style>
+    .background-image-logo {
+        background-image: url('src/assets/imagen/logogerenciaregional.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 20px;
+    }
+
     .background-image-class {
         background-image: url('src/assets/imagen/agricultura.jpeg');
         background-size: cover;
@@ -65,14 +128,18 @@
         background-repeat: no-repeat;
     }
 
-
     .custom-login-wrapper {
-        border-radius: 56px;
-        padding: 0.3rem;
+        border-radius: 32px;
+        padding: 2px;
         background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease-in-out;
     }
 
-    .custom-login-box {
-        border-radius: 53px;
+    /* Soporte para dropdown visible */
+    ::ng-deep .p-dropdown-panel {
+        z-index: 9999 !important;
+        max-height: 300px;
+        overflow-y: auto;
     }
 </style>

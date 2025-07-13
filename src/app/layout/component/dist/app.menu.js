@@ -8,69 +8,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 exports.__esModule = true;
 exports.AppMenu = void 0;
 var core_1 = require("@angular/core");
+var app_menuitem_1 = require("./app.menuitem");
 var common_1 = require("@angular/common");
 var router_1 = require("@angular/router");
-var app_menuitem_1 = require("./app.menuitem");
 var AppMenu = /** @class */ (function () {
-    function AppMenu() {
+    function AppMenu(cookieService) {
+        this.cookieService = cookieService;
         this.model = [];
     }
     AppMenu.prototype.ngOnInit = function () {
-        this.model = [
-            {
-                label: 'inicio',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
-            },
-            {
-                label: 'ofertas',
-                items: [
-                    { label: 'Ofertas Generales', icon: 'pi pi-fw pi-id-card', routerLink: ['/ofertas/frutas'] },
-                ]
-            },
-            {
-                label: 'demandas',
-                items: [
-                    { label: 'Demandas Generales', icon: 'pi pi-fw pi-id-card', routerLink: ['/demandas/demandas'] },
-                ]
-            },
-            {
-                label: 'categorias',
-                items: [{
-                        label: 'Maestras',
-                        icon: '',
-                        items: [
-                            { label: 'Tipo producto', icon: 'pi pi-fw pi-id-card', routerLink: ['/categorias/tipoproducto'] },
-                            { label: 'Productos', icon: 'pi pi-fw pi-id-card', routerLink: ['/categorias/producto'] },
-                        ]
-                    }
-                ]
-            },
-            {
-                label: 'Configuración',
-                items: [{
-                        label: 'Maestras',
-                        icon: '',
-                        items: [
-                            { label: 'Unidad Medida', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/unidadmedida'] },
-                            { label: 'Conversion Unidad Medida', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/conversionunidadmedida'] },
-                            { label: 'Mercado', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/mercado'] },
-                            { label: 'Pais', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/pais'] },
-                            { label: 'Departamento', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/departamento'] },
-                            { label: 'Provincia', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/provincia'] },
-                            { label: 'Distrito', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/distrito'] },
-                            { label: 'Localidad - Caserio', icon: 'pi pi-fw pi-id-card', routerLink: ['/general/localidadcaserio'] },
-                        ]
-                    }
-                ]
-            }
-        ];
+        var data = this.cookieService.get('userMenu');
+        var menu = data ? JSON.parse(decodeURIComponent(data)) : [];
+        this.model = menu;
     };
     AppMenu = __decorate([
         core_1.Component({
             selector: 'app-menu',
             standalone: true,
-            imports: [common_1.CommonModule, app_menuitem_1.AppMenuitem, router_1.RouterModule],
-            template: "<ul class=\"layout-menu\">\n        <ng-container *ngFor=\"let item of model; let i = index\">\n            <li app-menuitem *ngIf=\"!item.separator\" [item]=\"item\" [index]=\"i\" [root]=\"true\"></li>\n            <li *ngIf=\"item.separator\" class=\"menu-separator\"></li>\n        </ng-container>\n    </ul> "
+            imports: [common_1.CommonModule, router_1.RouterModule, app_menuitem_1.AppMenuitem],
+            template: "\n    <ul class=\"layout-menu\">\n        <ng-container *ngFor=\"let item of model; let i = index\">\n            <li app-menuitem [item]=\"item\" [index]=\"i\" [root]=\"true\"></li>\n            <li *ngIf=\"item.separator\" class=\"menu-separator\"></li>\n        </ng-container>\n    </ul>"
         })
     ], AppMenu);
     return AppMenu;

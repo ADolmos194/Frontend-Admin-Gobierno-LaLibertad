@@ -53,16 +53,19 @@ var inputtext_1 = require("primeng/inputtext");
 var password_1 = require("primeng/password");
 var divider_1 = require("primeng/divider");
 var ripple_1 = require("primeng/ripple");
-var autenticacion_service_1 = require("@/apis_modelos/autenticacion/autenticacion.service");
+var autenticacion_service_1 = require("@/apis_modelos/autenticacion/autenticacion_service/autenticacion.service");
 var api_1 = require("primeng/api");
 var toast_1 = require("primeng/toast");
-var app_floatingconfigurator_1 = require("../../../layout/component/app.floatingconfigurator");
+var progressspinner_1 = require("primeng/progressspinner");
 var Login = /** @class */ (function () {
-    function Login(usuariosistemaService, messageService, router) {
+    function Login(usuariosistemaService, messageService, router, cookie // 👈 agrega esto
+    ) {
         this.usuariosistemaService = usuariosistemaService;
         this.messageService = messageService;
         this.router = router;
+        this.cookie = cookie;
         this.isLoading = false;
+        this.isLoadingButton = false;
         this.isLoadingCrearCuenta = false;
         this.enviar = false;
         this.usuariosistemalogin = {
@@ -70,52 +73,68 @@ var Login = /** @class */ (function () {
             password: ''
         };
     }
-    Login.prototype.irACrearCuenta = function () {
+    Login.prototype.ngOnInit = function () {
         var _this = this;
-        this.isLoadingCrearCuenta = true;
+        this.isLoading = true;
         setTimeout(function () {
-            _this.router.navigate(['/auth/register']);
-        }, 2000);
+            _this.isLoading = false;
+        }, 1500); // simula una carga de 1.5 segundos
+    };
+    Login.prototype.irACrearCuenta = function () {
+        this.isLoadingCrearCuenta = true;
+        setTimeout(function () { return window.location.href = '/auth/register'; }, 1500);
     };
     Login.prototype.guardarUsuarioSistema = function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var UsuarioSistemaParaEnviar, response, error_1, msg;
+            var _c, usuario, password, response, _d, userData, menu, error_1, msg;
             var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0:
                         this.enviar = true;
-                        this.isLoading = true;
-                        _c.label = 1;
-                    case 1:
-                        _c.trys.push([1, 3, 4, 5]);
-                        UsuarioSistemaParaEnviar = {
-                            usuario: this.usuariosistemalogin.usuario,
-                            password: this.usuariosistemalogin.password
-                        };
-                        return [4 /*yield*/, this.usuariosistemaService.verificarUsuarioSistema(UsuarioSistemaParaEnviar)];
-                    case 2:
-                        response = _c.sent();
-                        if (response.status === "success") {
-                            this.usuariosistemaService.setUsuario(response.data.userData.usuario);
+                        _c = this.usuariosistemalogin, usuario = _c.usuario, password = _c.password;
+                        if (!usuario || !password) {
+                            this.messageService.add({
+                                severity: 'warn',
+                                summary: 'Campos requeridos',
+                                detail: 'Por favor complete usuario y contraseña.'
+                            });
+                            return [2 /*return*/];
                         }
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Éxito',
-                            detail: response.message_user || 'Inicio de sesión exitoso. Redirigiendo...'
-                        });
-                        setTimeout(function () {
-                            _this.router.navigate(['/']);
-                        }, 3000);
+                        this.isLoadingButton = true;
+                        _e.label = 1;
+                    case 1:
+                        _e.trys.push([1, 3, 4, 5]);
+                        return [4 /*yield*/, this.usuariosistemaService.verificarUsuarioSistema({ usuario: usuario, password: password })];
+                    case 2:
+                        response = _e.sent();
+                        if (response.status === 'success') {
+                            _d = response.data, userData = _d.userData, menu = _d.menu;
+                            // ✅ Guardar el menú en cookies desde el UsuarioSistemaService
+                            this.usuariosistemaService.guardarMenu(menu);
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'Éxito',
+                                detail: response.message_user || 'Inicio de sesión exitoso.'
+                            });
+                            setTimeout(function () {
+                                _this.isLoadingButton = false;
+                                _this.router.navigate(['/']);
+                            }, 2000);
+                        }
                         return [3 /*break*/, 5];
                     case 3:
-                        error_1 = _c.sent();
+                        error_1 = _e.sent();
                         msg = ((_b = (_a = error_1 === null || error_1 === void 0 ? void 0 : error_1.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message_user) || 'Error inesperado';
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Error al iniciar sesión',
+                            detail: msg
+                        });
                         return [3 /*break*/, 5];
                     case 4:
-                        this.isLoading = false;
+                        this.isLoadingButton = false;
                         return [7 /*endfinally*/];
                     case 5: return [2 /*return*/];
                 }
@@ -126,7 +145,7 @@ var Login = /** @class */ (function () {
         core_1.Component({
             selector: 'app-login',
             standalone: true,
-            imports: [common_1.CommonModule, button_1.ButtonModule, checkbox_1.CheckboxModule, inputtext_1.InputTextModule, password_1.PasswordModule, forms_1.FormsModule, router_1.RouterModule, ripple_1.RippleModule, toast_1.ToastModule, app_floatingconfigurator_1.AppFloatingConfigurator, divider_1.DividerModule],
+            imports: [common_1.CommonModule, button_1.ButtonModule, checkbox_1.CheckboxModule, inputtext_1.InputTextModule, password_1.PasswordModule, forms_1.FormsModule, router_1.RouterModule, ripple_1.RippleModule, toast_1.ToastModule, divider_1.DividerModule, progressspinner_1.ProgressSpinnerModule],
             templateUrl: './login.components.html',
             providers: [api_1.MessageService, autenticacion_service_1.UsuarioSistemaService, api_1.ConfirmationService]
         })

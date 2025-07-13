@@ -26,6 +26,7 @@
         "@primeng/themes": "^19.0.5",
         "axios": "^1.7.9",
         "chart.js": "4.4.2",
+        "crypto-js": "^4.2.0",
         "firebase": "^11.6.1",
         "ngx-cookie-service": "^19.1.2",
         "primeclt": "^0.1.5",

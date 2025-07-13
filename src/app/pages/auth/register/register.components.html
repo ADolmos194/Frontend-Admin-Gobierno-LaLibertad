@@ -1,95 +1,217 @@
 <p-toast />
-<app-floating-configurator />
-<div class="min-h-screen grid grid-cols-1 md:grid-cols-2">
-    <!-- Imagen a la izquierda -->
-    <div class="hidden md:block bg-cover bg-center bg-no-repeat background-image-class"></div>
+<!-- Pantalla de carga con fondo completamente transparente -->
+<div *ngIf="isLoading"
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center space-y-3 pointer-events-none">
+    <div class="background-image-logo"></div>
+    <p-progress-spinner strokeWidth="8" fill="transparent" animationDuration=".5s"
+        [style]="{ width: '50px', height: '50px' }">
+    </p-progress-spinner>
+    <span class="text-sm font-medium pointer-events-auto">Cargando...</span>
+</div>
 
-    <!-- Formulario a la derecha -->
-    <div class="flex items-center justify-center px-4 py-10 bg-white dark:bg-gray-900">
-        <div class="custom-login-wrapper w-full max-w-md">
-            <div class="bg-white dark:bg-gray-900 shadow-md rounded-xl px-8 py-10">
-                <div class="text-center mb-8">
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">AGROCULTURA GOBPE</h1>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2">Crea tu cuenta para continuar</p>
+
+<!-- Contenido principal solo si no se está cargando -->
+<div *ngIf="!isLoading" class="relative min-h-screen grid grid-cols-1 md:grid-cols-2 background-image-class">
+
+    <!-- Overlay degradado en TODO el fondo -->
+    <!-- Overlay oscuro en TODO el fondo (cubre toda la imagen de fondo) -->
+    <div class="absolute inset-0 bg-black/50 z-10"></div>
+
+    <!-- Panel lateral izquierdo con texto centrado -->
+    <div class="hidden md:flex flex-col justify-center items-center text-center px-8 relative z-20">
+        <h2 class="text-5xl font-extrabold text-white drop-shadow-lg mb-4">
+            Registra tus productos
+        </h2>
+        <h3 class="text-4xl font-bold text-green-300 mt-2 drop-shadow-lg">
+            agrícolas con facilidad
+        </h3>
+        <p class="text-2xl text-gray-200 mt-6 max-w-md">
+            Lleva el control de tus cultivos, frutas y vegetales disponibles para venta en nuestra plataforma.
+        </p>
+
+    </div>
+
+
+    <!-- Formulario -->
+    <div class="flex items-center justify-center p-6 md:p-12 relative z-20">
+        <div
+            class="w-full max-w-2xl bg-white dark:bg-gray-900/80 backdrop-blur-xl shadow-xl rounded-2xl p-8 md:p-12 transition-transform duration-300 hover:scale-[1.015]">
+
+            <!-- Título -->
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-3">Crea tu cuenta</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg">y únete a nuestra comunidad agrícola</p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Email -->
+                <div>
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-envelope text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.email" placeholder="Email"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.email">Email es
+                        requerido</small>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5">
-                    <div>
-                        <p-inputgroup>
-                            <p-inputgroup-addon>
-                                <i class="pi pi-user text-gray-500 dark:text-gray-400"></i>
-                            </p-inputgroup-addon>
-                            <input pInputText [(ngModel)]="usuariosistemaregister.nombre" placeholder="Nombre"
-                                required />
-                        </p-inputgroup>
-                        <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.nombre">Nombre es
-                            requerido</small>
-                    </div>
-                    <div>
-                        <p-inputgroup>
-                            <p-inputgroup-addon>
-                                <i class="pi pi-user text-gray-500 dark:text-gray-400"></i>
-                            </p-inputgroup-addon>
-                            <input pInputText [(ngModel)]="usuariosistemaregister.apellido" placeholder="Apellido"
-                                required />
-
-                        </p-inputgroup>
-                        <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.apellido">Apellido es
-                            requerido</small>
-                    </div>
-
-                    <div>
-                        <p-inputgroup>
-                            <p-inputgroup-addon>
-                                <i class="pi pi-user text-gray-500 dark:text-gray-400"></i>
-                            </p-inputgroup-addon>
-                            <input pInputText [(ngModel)]="usuariosistemaregister.usuario" placeholder="Usuario"
-                                required />
-                        </p-inputgroup>
-                        <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.usuario">Usuario es
-                            requerido</small>
-                    </div>
-                    <div>
-                        <p-inputgroup>
-                            <p-inputgroup-addon>
-                                <i class="pi pi-lock text-gray-500 dark:text-gray-400"></i>
-                            </p-inputgroup-addon>
-                            <input type="password" pInputText [(ngModel)]="usuariosistemaregister.password"
-                                placeholder="Contraseña" required />
-
-                        </p-inputgroup>
-                        <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.nombre">Contraseña es
-                            requerido</small>
-                    </div>
-                    <div>
-                        <p-inputgroup>
-                            <p-inputgroup-addon>
-                                <i class="pi pi-envelope text-gray-500 dark:text-gray-400"></i>
-                            </p-inputgroup-addon>
-                            <input pInputText [(ngModel)]="usuariosistemaregister.email" placeholder="Email" required />
-                        </p-inputgroup>
-                        <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.nombre">Email es
-                            requerido</small>
-                    </div>
-
-                    <div class="flex justify-end mt-4">
-                        <span class="text-sm text-primary font-medium cursor-pointer hover:underline"
-                            (click)="irAlLogin()">¿Ya tienes una
-                            cuenta?</span>
-                    </div>
-
-                    <div class="mt-8">
-                        <p-button label="Registrar" styleClass="w-full" (onClick)="guardarUsuarioSistema()"
-                            [loading]="isLoading">
-                        </p-button>
-                    </div>
+                <!-- Usuario -->
+                <div>
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-user text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.usuario" placeholder="Usuario"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.usuario">Usuario es
+                        requerido</small>
                 </div>
+
+                <!-- Contraseña -->
+                <div class="col-span-2">
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-lock text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input type="password" pInputText [(ngModel)]="usuariosistemaregister.password"
+                            placeholder="Contraseña"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.password">Contraseña es
+                        requerida</small>
+                </div>
+
+                <!-- Nombre completo -->
+                <div class="col-span-2">
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-user text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.nombrecompleto"
+                            placeholder="Nombre completo"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.nombrecompleto">Nombre completo
+                        es requerido</small>
+                </div>
+
+                <!-- Tipo documento -->
+                <div>
+                    <p-select [(ngModel)]="usuariosistemaregister.tipodocumento" [options]="tipodocuemtoselccionado"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar tipo documento"
+                        styleClass="w-full focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                </div>
+
+                <!-- Nro documento -->
+                <div>
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-id-card text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.numerodocumento"
+                            placeholder="Nro de documento"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.numerodocumento">Nro de
+                        documento es requerido</small>
+                </div>
+
+                <!-- Nro celular -->
+                <div>
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-mobile text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.numero_celular" placeholder="Nro celular"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.numero_celular">Nro celular es
+                        requerido</small>
+                </div>
+
+                <!-- Nro teléfono -->
+                <div>
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-phone text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.numero_telefono"
+                            placeholder="(Opcional) Nro teléfono"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                </div>
+
+                <!-- Distrito -->
+                <div class="col-span-2">
+                    <label for="distrito_id" class="block text-sm font-semibold mb-1 text-gray-700 dark:text-gray-300">
+                        Distrito - Provincia - Departamento - País
+                    </label>
+                    <p-select [(ngModel)]="usuariosistemaregister.distrito_id" inputId="distrito_id"
+                        [options]="opcionesDistritoActivos" optionLabel="nombre" optionValue="id"
+                        placeholder="Seleccionar distrito"
+                        styleClass="w-full focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.distrito_id">Distrito es
+                        requerido</small>
+                </div>
+
+                <!-- Dirección -->
+                <div class="col-span-2">
+                    <p-inputgroup>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-map-marker text-green-600"></i>
+                        </p-inputgroup-addon>
+                        <input pInputText [(ngModel)]="usuariosistemaregister.direccion" placeholder="Dirección"
+                            class="focus:ring-2 focus:ring-green-500 rounded-lg transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    </p-inputgroup>
+                    <small class="text-red-500" *ngIf="enviar && !usuariosistemaregister.direccion">La dirección es
+                        requerida</small>
+                </div>
+
+                <!-- Términos -->
+                <div class="col-span-2 flex items-center space-x-3 mt-2">
+                    <input type="checkbox" [(ngModel)]="usuariosistemaregister.terminos_condiciones"
+                        class="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 transition duration-200 hover:ring-2 hover:ring-green-300" />
+                    <span class="flex items-center text-gray-700 dark:text-gray-300 text-sm">
+                        <i class="pi pi-check-circle text-green-500 mr-1"></i>
+                        Acepto los términos y condiciones
+                    </span>
+                </div>
+
+                <!-- Link login -->
+                <div class="col-span-2 flex justify-end mt-3">
+                    <span class="text-sm text-green-600 font-medium cursor-pointer hover:underline"
+                        (click)="irAlLogin()">¿Ya tienes una cuenta?</span>
+                </div>
+
+                <!-- Botón registrar -->
+                <div class="col-span-2 mt-6">
+                    <p-button label="Registrar" styleClass="w-full" (onClick)="guardarUsuarioSistema()"
+                        [loading]="isLoadingButton"></p-button>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
+
+
+
 <style>
+    .background-image-logo {
+        background-image: url('src/assets/imagen/logogerenciaregional.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 20px;
+    }
 
     .background-image-class {
         background-image: url('src/assets/imagen/agricultura.jpeg');
@@ -98,16 +220,18 @@
         background-repeat: no-repeat;
     }
 
-
     .custom-login-wrapper {
         border-radius: 32px;
         padding: 2px;
         background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease-in-out;
     }
 
-    @media (max-width: 768px) {
-        .register-container {
-            grid-template-columns: 1fr !important;
-        }
+    /* Soporte para dropdown visible */
+    ::ng-deep .p-dropdown-panel {
+        z-index: 9999 !important;
+        max-height: 300px;
+        overflow-y: auto;
     }
 </style>

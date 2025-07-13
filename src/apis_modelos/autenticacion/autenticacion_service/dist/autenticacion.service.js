@@ -95,14 +95,16 @@ var UsuarioSistemaService = /** @class */ (function () {
     }
     UsuarioSistemaService.prototype.verificarUsuarioSistema = function (data) {
         return __awaiter(this, void 0, void 0, function () {
-            var res, _a, access, refresh, userData;
+            var res, _a, access, refresh, userData, menu;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, axios_1.axiosIns.post("" + url + endpoints.verificar, data)];
                     case 1:
                         res = _b.sent();
-                        _a = res.data.data || {}, access = _a.access, refresh = _a.refresh, userData = _a.userData;
-                        if (access && refresh && (userData === null || userData === void 0 ? void 0 : userData.email)) {
+                        _a = res.data.data || {}, access = _a.access, refresh = _a.refresh, userData = _a.userData, menu = _a.menu;
+                        if (access && refresh && (userData === null || userData === void 0 ? void 0 : userData.email) && menu) {
+                            // 🧹 Limpia antes para asegurar token limpio
+                            this.clearUsuario();
                             this.cookie.set('access_token', access, 1, '/');
                             this.cookie.set('refresh_token', refresh, 1, '/');
                             this.cookie.set('userData', encodeURIComponent(JSON.stringify(userData)), 1, '/');
@@ -114,12 +116,16 @@ var UsuarioSistemaService = /** @class */ (function () {
             });
         });
     };
+    UsuarioSistemaService.prototype.guardarMenu = function (menu) {
+        this.cookie.set('userMenu', encodeURIComponent(JSON.stringify(menu)), 1, '/');
+    };
     UsuarioSistemaService.prototype.setUsuario = function (email) {
         this.usuarioSubject.next(email);
     };
     UsuarioSistemaService.prototype.clearUsuario = function () {
         var _this = this;
-        ['access_token', 'refresh_token', 'usuarioSistemaId', 'usuario', 'userData'].forEach(function (k) { return _this.cookie["delete"](k); });
+        ['access_token', 'refresh_token', 'usuarioSistemaId', 'usuario', 'userData', 'userMenu']
+            .forEach(function (k) { return _this.cookie["delete"](k); });
         this.usuarioSubject.next(null);
     };
     UsuarioSistemaService = __decorate([

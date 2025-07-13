@@ -65,6 +65,7 @@ var AppLogout = /** @class */ (function () {
         this.cookie["delete"]('access_token', '/');
         this.cookie["delete"]('refresh_token', '/');
         this.cookie["delete"]('userData', '/');
+        this.cookie["delete"]('userMenu', '/');
         this.usuariosistemaService.clearUsuario();
         this.router.navigate(['/auth/login']);
     };

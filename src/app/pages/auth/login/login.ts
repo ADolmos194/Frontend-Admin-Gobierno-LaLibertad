@@ -8,74 +8,102 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 import { RippleModule } from 'primeng/ripple';
-import { UsuariosSistemaLogin } from '@/apis_modelos/autenticacion/autenticacionlogin.model';
-import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
+import { UsuariosSistemaLogin } from '@/apis_modelos/autenticacion/autenticacion_service/autenticacionlogin.model';
+import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion_service/autenticacion.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { Router } from '@angular/router';
-import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, ToastModule, AppFloatingConfigurator, DividerModule],
+    imports: [CommonModule, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, ToastModule, DividerModule, ProgressSpinnerModule],
     templateUrl: './login.components.html',
     providers: [MessageService, UsuarioSistemaService, ConfirmationService]
 })
-export class Login {
-    isLoading: boolean = false;
-    isLoadingCrearCuenta: boolean = false;
-    enviar: boolean = false;
+export class Login implements OnInit {
+    isLoading = false;
+    isLoadingButton: boolean = false;
+    isLoadingCrearCuenta = false;
+    enviar = false;
+
     usuariosistemalogin: UsuariosSistemaLogin = {
         usuario: '',
         password: '',
     };
+    cookie1: any;
+
     constructor(
         private usuariosistemaService: UsuarioSistemaService,
         private messageService: MessageService,
-        private router: Router
+        private router: Router,
+        private cookie: CookieService   // 👈 agrega esto
     ) { }
 
-    irACrearCuenta() {
-        this.isLoadingCrearCuenta = true
+
+    ngOnInit() {
+        this.isLoading = true;
         setTimeout(() => {
-            this.router.navigate(['/auth/register']);
-        }, 2000);
+            this.isLoading = false;
+        }, 1500); // simula una carga de 1.5 segundos
+    }
+
+
+    irACrearCuenta() {
+        this.isLoadingCrearCuenta = true;
+        setTimeout(() => window.location.href = '/auth/register', 1500);
     }
 
     async guardarUsuarioSistema() {
         this.enviar = true;
-        this.isLoading = true;
+
+        const { usuario, password } = this.usuariosistemalogin;
+        if (!usuario || !password) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Campos requeridos',
+                detail: 'Por favor complete usuario y contraseña.',
+            });
+            return;
+        }
+
+        this.isLoadingButton = true;
+
         try {
-            const UsuarioSistemaParaEnviar = {
-                usuario: this.usuariosistemalogin.usuario,
-                password: this.usuariosistemalogin.password,
-            };
+            const response = await this.usuariosistemaService.verificarUsuarioSistema({ usuario, password });
 
-            const response = await this.usuariosistemaService.verificarUsuarioSistema(UsuarioSistemaParaEnviar);
+            if (response.status === 'success') {
+                const { userData, menu } = response.data;
 
-            if (response.status === "success") {
-                this.usuariosistemaService.setUsuario(response.data.userData.usuario);
+                // ✅ Guardar el menú en cookies desde el UsuarioSistemaService
+                this.usuariosistemaService.guardarMenu(menu);
+
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: response.message_user || 'Inicio de sesión exitoso.',
+                });
+
+                setTimeout(() => {
+                    this.isLoadingButton = false;
+                    this.router.navigate(['/']);
+                }, 2000);
             }
 
 
-
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: response.message_user || 'Inicio de sesión exitoso. Redirigiendo...'
-            });
-
-            setTimeout(() => {
-                this.router.navigate(['/']);
-            }, 3000);
-
         } catch (error: any) {
             const msg = error?.response?.data?.message_user || 'Error inesperado';
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error al iniciar sesión',
+                detail: msg,
+            });
         } finally {
-            this.isLoading = false;
+            this.isLoadingButton = false;
         }
     }
+
 
 }

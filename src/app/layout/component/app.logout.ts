@@ -1,4 +1,4 @@
-import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion.service';
+import { UsuarioSistemaService } from '@/apis_modelos/autenticacion/autenticacion_service/autenticacion.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -79,6 +79,7 @@ export class AppLogout implements OnInit {
         this.cookie.delete('access_token', '/');
         this.cookie.delete('refresh_token', '/');
         this.cookie.delete('userData', '/');
+        this.cookie.delete('userMenu', '/');
 
         this.usuariosistemaService.clearUsuario();
         this.router.navigate(['/auth/login']);
