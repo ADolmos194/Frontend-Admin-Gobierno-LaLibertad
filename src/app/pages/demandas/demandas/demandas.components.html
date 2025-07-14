@@ -204,12 +204,21 @@
             </div>
 
             <div>
-                <label for="localidadcaserio_id" class="block font-bold mb-3">Localidad -
-                    Caserio</label>
-                <p-select [(ngModel)]="demanda.localidadcaserio_id" inputId="localidadcaserio_id"
-                    [options]="opcionesLocalidadCaserioActivo" optionLabel="nombre" optionValue="id"
-                    placeholder="Seleccionar localidad - caserio" appendTo="body" fluid />
+                <label for="distrito_id" class="block font-bold mb-3">Distrito</label>
+                <p-select [(ngModel)]="demanda.distrito_id" inputId="distrito_id" [options]="opcionesDistritosActivos"
+                    optionLabel="nombre" optionValue="id" placeholder="Seleccionar distrito" appendTo="body" fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.distrito_id">Distrito es
+                    requerido</small>
             </div>
+
+            <div>
+                <label for="localidadcaserio" class="block font-bold mb-3">Localidad - Caserio</label>
+                <input type="text" pInputText [(ngModel)]="demanda.localidadcaserio" id="localidadcaserio" required fluid />
+                <small class="text-red-500" *ngIf="enviar && !demanda.localidadcaserio">Localidad Caserio
+                    es
+                    requerido</small>
+            </div>
+
             <div>
                 <label for="direccion" class="block font-bold mb-3">Dirección</label>
                 <input type="text" pInputText [(ngModel)]="demanda.direccion" id="direccion" required fluid />
@@ -298,8 +307,8 @@
 
                     <div class="flex items-start gap-2">
                         <i class="pi pi-map-marker pt-1"></i>
-                        <span><strong>Ubicación:</strong> {{ demanda.direccion }}, {{ demanda.nombre_localidadcaserio
-                            }}</span>
+                        <span><strong>Ubicación:</strong> {{ demanda.direccion }}, {{ demanda.localidadcaserio
+                            }}, {{ demanda.nombre_distrito }}</span>
                     </div>
 
                     <div class="flex items-start gap-2">

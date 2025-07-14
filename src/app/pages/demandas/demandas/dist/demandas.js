@@ -84,7 +84,7 @@ var tooltip_1 = require("primeng/tooltip");
 var fileupload_1 = require("primeng/fileupload");
 var card_1 = require("primeng/card");
 var DemandasGeneral = /** @class */ (function () {
-    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, localidadcaserioService, imageUploadService, confirmationService, cookieService) {
+    function DemandasGeneral(demandasService, messageService, estadoService, provinciaService, distritoService, productoService, tipoproductoService, imageUploadService, confirmationService, cookieService) {
         this.demandasService = demandasService;
         this.messageService = messageService;
         this.estadoService = estadoService;
@@ -92,7 +92,6 @@ var DemandasGeneral = /** @class */ (function () {
         this.distritoService = distritoService;
         this.productoService = productoService;
         this.tipoproductoService = tipoproductoService;
-        this.localidadcaserioService = localidadcaserioService;
         this.imageUploadService = imageUploadService;
         this.confirmationService = confirmationService;
         this.cookieService = cookieService;
@@ -113,7 +112,9 @@ var DemandasGeneral = /** @class */ (function () {
             nombre_producto: '',
             descripcion: '',
             nota: '',
-            localidadcaserio_id: 0,
+            distrito_id: 0,
+            nombre_distrito: '',
+            localidadcaserio: '',
             nombre_localidadcaserio: '',
             direccion: '',
             referencia_ubicacion: '',
@@ -135,7 +136,6 @@ var DemandasGeneral = /** @class */ (function () {
         this.opcionesDistritosActivos = [];
         this.opcionesProductosActivos = [];
         this.opcionesTipoProductosActivos = [];
-        this.opcionesLocalidadCaserioActivo = [];
         this.opcionesTipoDemandasActivas = [];
         this.skeletonRows = new Array(8).fill({});
         this.selectedFile = null;
@@ -203,6 +203,7 @@ var DemandasGeneral = /** @class */ (function () {
                             { field: 'nombre_producto', header: 'Producto' },
                             { field: 'descripcion', header: 'Descripción' },
                             { field: 'nota', header: 'Nota' },
+                            { field: 'nombre_distrito', header: 'Distrito' },
                             { field: 'nombre_localidadcaserio', header: 'Localidad - Caserio' },
                             { field: 'direccion', header: 'Dirección' },
                             { field: 'referencia_ubicacion', header: 'Referencia de ubicación' },
@@ -274,7 +275,7 @@ var DemandasGeneral = /** @class */ (function () {
                         this.isLoading = true;
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 10, 11, 12]);
+                        _a.trys.push([1, 9, 10, 11]);
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.demandasService.getTiposDemandas.bind(this.demandasService), this.opcionesTipoDemandasActivas, 'tipos demandas activos')])];
                     case 2:
                         _a.sent();
@@ -290,26 +291,23 @@ var DemandasGeneral = /** @class */ (function () {
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')])];
                     case 6:
                         _a.sent();
-                        return [4 /*yield*/, Promise.all([this.cargarOpciones(this.localidadcaserioService.getLocalidadesCaseriosActivos.bind(this.localidadcaserioService), this.opcionesLocalidadCaserioActivo, 'localidad - caserio')])];
-                    case 7:
-                        _a.sent();
                         return [4 /*yield*/, Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')])];
-                    case 8:
+                    case 7:
                         _a.sent();
                         usuarioId = this.getUsuarioSistemaId();
                         return [4 /*yield*/, this.cargarDemandas()];
-                    case 9:
+                    case 8:
                         _a.sent();
                         this.demandasgeneral = this.demandas();
-                        return [3 /*break*/, 12];
-                    case 10:
+                        return [3 /*break*/, 11];
+                    case 9:
                         error_3 = _a.sent();
                         console.error('Error al cargar los país:', error_3);
-                        return [3 /*break*/, 12];
-                    case 11:
+                        return [3 /*break*/, 11];
+                    case 10:
                         this.isLoading = false;
                         return [7 /*endfinally*/];
-                    case 12: return [2 /*return*/];
+                    case 11: return [2 /*return*/];
                 }
             });
         });
@@ -347,7 +345,9 @@ var DemandasGeneral = /** @class */ (function () {
             nombre_producto: '',
             descripcion: '',
             nota: '',
-            localidadcaserio_id: 0,
+            distrito_id: 0,
+            nombre_distrito: '',
+            localidadcaserio: '',
             nombre_localidadcaserio: '',
             direccion: '',
             referencia_ubicacion: '',
@@ -396,7 +396,8 @@ var DemandasGeneral = /** @class */ (function () {
                             producto: this.demanda.producto_id,
                             descripcion: this.demanda.descripcion,
                             nota: this.demanda.nota,
-                            localidadcaserio: this.demanda.localidadcaserio_id,
+                            distrito: this.demanda.distrito_id,
+                            localidadcaserio: this.demanda.localidadcaserio,
                             direccion: this.demanda.direccion,
                             referencia_ubicacion: this.demanda.referencia_ubicacion,
                             contacto: this.demanda.contacto,

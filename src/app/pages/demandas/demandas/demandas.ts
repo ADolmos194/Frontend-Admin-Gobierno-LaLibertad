@@ -39,9 +39,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FileUpload } from 'primeng/fileupload';
 import { CardModule } from 'primeng/card';
 import { CookieService } from 'ngx-cookie-service';
-import { LocalidadCaserioActivos } from '@/apis_modelos/general/localidadcaserio_service/localidadcaserioactivos.model';
 import { TipoDemandasActivas } from '@/apis_modelos/demandas/tipodemandasactivos.model';
-import { LocalidadCaserioService } from '@/apis_modelos/general/localidadcaserio_service/localidadcaserio.service';
 
 
 interface Column {
@@ -110,7 +108,9 @@ export class DemandasGeneral implements OnInit {
         nombre_producto: '',
         descripcion: '',
         nota: '',
-        localidadcaserio_id: 0,
+        distrito_id:0,
+        nombre_distrito:'',
+        localidadcaserio: '',
         nombre_localidadcaserio: '',
         direccion: '',
         referencia_ubicacion: '',
@@ -133,8 +133,6 @@ export class DemandasGeneral implements OnInit {
     opcionesDistritosActivos: DistritosActivos[] = [];
     opcionesProductosActivos: ProductosActivos[] = [];
     opcionesTipoProductosActivos: TiposProductosActivos[] = [];
-
-    opcionesLocalidadCaserioActivo: LocalidadCaserioActivos[] = [];
     opcionesTipoDemandasActivas: TipoDemandasActivas[] = [];
 
     skeletonRows: any[] = new Array(8).fill({});
@@ -185,7 +183,6 @@ export class DemandasGeneral implements OnInit {
         private distritoService: DistritoService,
         private productoService: ProductoService,
         private tipoproductoService: TipoProductoService,
-        private localidadcaserioService: LocalidadCaserioService,
         private imageUploadService: ImageUploadService,
         private confirmationService: ConfirmationService,
         private cookieService: CookieService
@@ -216,6 +213,7 @@ export class DemandasGeneral implements OnInit {
             { field: 'nombre_producto', header: 'Producto' },
             { field: 'descripcion', header: 'Descripción' },
             { field: 'nota', header: 'Nota' },
+            { field: 'nombre_distrito', header: 'Distrito' },
             { field: 'nombre_localidadcaserio', header: 'Localidad - Caserio' },
             { field: 'direccion', header: 'Dirección' },
             { field: 'referencia_ubicacion', header: 'Referencia de ubicación' },
@@ -268,7 +266,6 @@ export class DemandasGeneral implements OnInit {
             await Promise.all([this.cargarOpciones(this.distritoService.getDistritosActivos.bind(this.distritoService), this.opcionesDistritosActivos, 'distritos activos')]);
             await Promise.all([this.cargarOpciones(this.productoService.getProductosActivos.bind(this.productoService), this.opcionesProductosActivos, 'productos activos')]);
             await Promise.all([this.cargarOpciones(this.tipoproductoService.getTipoProductoActivos.bind(this.tipoproductoService), this.opcionesTipoProductosActivos, 'tipos productos activos')]);
-            await Promise.all([this.cargarOpciones(this.localidadcaserioService.getLocalidadesCaseriosActivos.bind(this.localidadcaserioService), this.opcionesLocalidadCaserioActivo, 'localidad - caserio')]);
             await Promise.all([this.cargarOpciones(this.estadoService.getEstado.bind(this.estadoService), this.opcionesEstado, 'estado')]);
             const usuarioId = this.getUsuarioSistemaId();
             await this.cargarDemandas();
@@ -317,7 +314,9 @@ export class DemandasGeneral implements OnInit {
             nombre_producto: '',
             descripcion: '',
             nota: '',
-            localidadcaserio_id: 0,
+            distrito_id:0,
+            nombre_distrito:'',
+            localidadcaserio: '',
             nombre_localidadcaserio: '',
             direccion: '',
             referencia_ubicacion: '',
@@ -364,7 +363,8 @@ export class DemandasGeneral implements OnInit {
                 producto: this.demanda.producto_id,
                 descripcion: this.demanda.descripcion,
                 nota: this.demanda.nota,
-                localidadcaserio: this.demanda.localidadcaserio_id,
+                distrito: this.demanda.distrito_id,
+                localidadcaserio: this.demanda.localidadcaserio,
                 direccion: this.demanda.direccion,
                 referencia_ubicacion: this.demanda.referencia_ubicacion,
                 contacto: this.demanda.contacto,
